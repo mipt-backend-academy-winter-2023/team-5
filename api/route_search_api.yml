@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: Route Search API
+  description: A route search API that allows users to register, authenticate, and search for routes using route point IDs.
+  version: 1.0.0
+
+servers:
+  - url: https://api.maps.tinkoff.ru/v1
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication using the JWT standard
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: |
+        Allows a user to register by submitting a username and password.
+        If the registration is successful, the user will receive a confirmation message.
+        If not, the user will be informed of the reason for the failure.
+      tags:
+        - Authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "login"
+                  description: The desired username
+                password:
+                  type: string
+                  example: "password"
+                  description: The desired password
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: User registered successfully
+        '400':
+          description: Invalid input or user already exists
+
+  /authenticate:
+    post:
+      summary: Authenticate a user
+      description: |
+        Allows a user to authenticate by passing their username and password.
+        If the authentication is successful, the user will receive an authorization token.
+        If not, the user will be informed of the reason for the failure.
+      tags:
+        - Authenticate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "login"
+                  description: The user's username
+                password:
+                  type: string
+                  example: "password"
+                  description: The user's password
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: User authenticated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjozNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    description: The authorization token
+        '401':
+          description: Invalid username or password
+
+  /route:
+    post:
+      summary: Search for a route
+      description: |
+        Allows a user to search for a route by passing a list of route point IDs.
+        If the search is successful, the user will receive a list of points representing the route.
+        The user must provide a valid authorization token in the header.
+      tags:
+        - Common
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                route_point_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: A list of route point IDs
+              required:
+                - route_point_ids
+      responses:
+        '200':
+          description: Route search successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  route_points:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The route point identifier
+                        name:
+                          type: string
+                          description: The name of the route point to display
+                      required:
+                        - id
+                        - name
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
