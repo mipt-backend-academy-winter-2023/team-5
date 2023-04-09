@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: Сервис поиска маршрутов OpenAPI спецификация
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1/
+    description: Dev server
+paths:
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        '200':
+          description: Пользователь успешно авторизовался
+          headers:
+            Authorization:
+              schema:
+                $ref: "#/components/schemas/AuthorizationToken"
+        '401':
+          $ref: "#/components/responses/UserWithoutCredentials"
+  /auth/register:
+     post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+        '400':
+          $ref: "#/components/responses/UserWithoutCredentials"
+  /route/search:
+    post:
+      summary: Поиск маршрута по идентификаторам точек
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteQuery"
+      responses:
+        '200':
+          description: Маршрут успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MapPoints"
+        '401':
+          $ref: "#/components/responses/UserUnauthorized"
+      security:
+        - bearerAuth: []
+
+
+components:
+  responses:
+    UserUnauthorized:
+      description: Пользователь не авторизирован
+    UserWithoutCredentials:
+      description: Не хватает логина или пароля
+  schemas:
+    AuthorizationToken:
+      type: string
+      example: token-khjqbrkghbvsmdhfblqr894yr17iyg4l7w4
+      description: Токен для использования в других методах
+    UserCredentials:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    IdMapPoint:
+      type: string
+      example: id-p3945anwr2323bqert4
+      description: Идентификатор точки маршрута
+    RouteQuery:
+      type: array
+      items:
+        $ref: "#/components/schemas/IdMapPoint"
+    MapPoint:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/IdMapPoint"
+        name: 
+          type: string
+          example: Красная площадь
+    MapPoints:
+      type: array
+      items:
+        $ref: "#/components/schemas/MapPoint"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
