@@ -2,9 +2,6 @@ openapi: 3.0.0
 info:
   title: Сервис поиска маршрутов OpenAPI спецификация
   version: 1.0.0
-servers:
-  - url: http://localhost:8000/api/v1/
-    description: Dev server
 paths:
   /auth/login:
     post:
@@ -17,10 +14,12 @@ paths:
       responses:
         '200':
           description: Пользователь успешно авторизовался
-          headers:
-            Authorization:
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationToken"
+        '400':
+          $ref: "#/components/responses/LoginUnsuccessful"
         '401':
           $ref: "#/components/responses/UserWithoutCredentials"
   /auth/register:
@@ -34,6 +33,8 @@ paths:
       responses:
         '200':
           description: Пользователь успешно зарегистрирован
+        '403':
+          $ref: "#/components/responses/UserExisting"
         '400':
           $ref: "#/components/responses/UserWithoutCredentials"
   /route/search:
@@ -50,7 +51,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MapPoints"
+                type: array
+                items:
+                  $ref: "#/components/schemas/MapPoint"
         '401':
           $ref: "#/components/responses/UserUnauthorized"
       security:
@@ -61,12 +64,16 @@ components:
   responses:
     UserUnauthorized:
       description: Пользователь не авторизирован
+    UserExisting:
+      description: Пользователь существует
     UserWithoutCredentials:
       description: Не хватает логина или пароля
+    LoginUnsuccessful:
+      description: Неудачная авторизация
   schemas:
     AuthorizationToken:
       type: string
-      example: token-khjqbrkghbvsmdhfblqr894yr17iyg4l7w4
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
       description: Токен для использования в других методах
     UserCredentials:
       type: object
@@ -97,10 +104,6 @@ components:
         name: 
           type: string
           example: Красная площадь
-    MapPoints:
-      type: array
-      items:
-        $ref: "#/components/schemas/MapPoint"
   securitySchemes:
     bearerAuth:
       type: http
