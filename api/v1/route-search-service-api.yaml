@@ -44,7 +44,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RouteQuery"
+              type: array
+              items:
+                $ref: "#/components/schemas/IdMapPoint"
       responses:
         '200':
           description: Маршрут успешно найден
@@ -89,10 +91,6 @@ components:
       type: string
       example: id-p3945anwr2323bqert4
       description: Идентификатор точки маршрута
-    RouteQuery:
-      type: array
-      items:
-        $ref: "#/components/schemas/IdMapPoint"
     MapPoint:
       type: object
       required:
