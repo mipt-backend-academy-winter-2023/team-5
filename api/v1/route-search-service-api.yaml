@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: Сервис поиска маршрутов OpenAPI спецификация
+  version: 1.0.0
+paths:
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        '200':
+          description: Пользователь успешно авторизовался
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationToken"
+        '400':
+          $ref: "#/components/responses/LoginUnsuccessful"
+        '401':
+          $ref: "#/components/responses/UserWithoutCredentials"
+  /auth/register:
+     post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+        '403':
+          $ref: "#/components/responses/UserExisting"
+        '400':
+          $ref: "#/components/responses/UserWithoutCredentials"
+  /route/search:
+    post:
+      summary: Поиск маршрута по идентификаторам точек
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/IdMapPoint"
+      responses:
+        '200':
+          description: Маршрут успешно найден
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MapPoint"
+        '401':
+          $ref: "#/components/responses/UserUnauthorized"
+      security:
+        - bearerAuth: []
+
+
+components:
+  responses:
+    UserUnauthorized:
+      description: Пользователь не авторизирован
+    UserExisting:
+      description: Пользователь существует
+    UserWithoutCredentials:
+      description: Не хватает логина или пароля
+    LoginUnsuccessful:
+      description: Неудачная авторизация
+  schemas:
+    AuthorizationToken:
+      type: string
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      description: Токен для использования в других методах
+    UserCredentials:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    IdMapPoint:
+      type: string
+      example: id-p3945anwr2323bqert4
+      description: Идентификатор точки маршрута
+    MapPoint:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/IdMapPoint"
+        name: 
+          type: string
+          example: Красная площадь
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
