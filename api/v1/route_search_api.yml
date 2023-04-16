@@ -14,6 +14,33 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Bearer token authentication using the JWT standard
+  schemas:
+    LoginAndPassword:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "login"
+          description: The user's username
+        password:
+          type: string
+          example: "password"
+          description: The user's password
+      required:
+        - username
+        - password
+    RoutePoint:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The route point identifier
+        name:
+          type: string
+          description: The name of the route point to display
+      required:
+        - id
+        - name
 
 paths:
   /register:
@@ -30,24 +57,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: "login"
-                  description: The desired username
-                password:
-                  type: string
-                  example: "password"
-                  description: The desired password
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/LoginAndPassword'
       responses:
         '200':
           description: User registered successfully
         '400':
-          description: Invalid input or user already exists
+          description: Invalid input
+        '401':
+          description: User already exists
 
   /authenticate:
     post:
@@ -63,19 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  example: "login"
-                  description: The user's username
-                password:
-                  type: string
-                  example: "password"
-                  description: The user's password
-              required:
-                - username
-                - password
+              $ref: '#/components/schemas/LoginAndPassword'
       responses:
         '200':
           description: User authenticated successfully
@@ -88,7 +93,7 @@ paths:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjozNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                     description: The authorization token
-        '401':
+        '400':
           description: Invalid username or password
 
   /route:
@@ -106,39 +111,30 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                route_point_ids:
-                  type: array
-                  items:
-                    type: integer
-                  description: A list of route point IDs
-              required:
-                - route_point_ids
-      responses:
-        '200':
-          description: Route search successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  route_points:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          description: The route point identifier
-                        name:
-                          type: string
-                          description: The name of the route point to display
-                      required:
-                        - id
-                        - name
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
+      application/json:
+        schema:
+          type: object
+          properties:
+            route_point_ids:
+              type: array
+              items:
+                type: string
+              description: A list of route point IDs
+          required:
+            - route_point_ids
+  responses:
+    '200':
+      description: Route search successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              route_points:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoutePoint'
+    '400':
+      description: Invalid input
+    '401':
+      description: Unauthorized
