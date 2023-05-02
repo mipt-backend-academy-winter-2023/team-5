@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  auth_app:
+    build:
+      context: .
+      dockerfile: Dockerfile-auth
+    image: project-mipt:latest
+    container_name: auth_app
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=production
+      - APP_CONFIG=/app/auth-application.conf
+
+  routing_app:
+    build:
+      context: .
+      dockerfile: Dockerfile-routing
+    image: project-mipt:latest
+    container_name: routing_app
+    ports:
+      - "8081:8081"
+    environment:
+      - APP_ENV=production
+      - APP_CONFIG=/app/routing-application.conf
