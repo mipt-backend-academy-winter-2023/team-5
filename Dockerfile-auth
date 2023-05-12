@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN sbt "project auth" compile package
+RUN sbt compile package
 
 FROM openjdk:8-jre-alpine
 
@@ -15,7 +15,6 @@ COPY --from=builder /app/auth/src/main/resources/application.conf /app/auth-appl
 
 EXPOSE 8080
 
-ENV APP_ENV production
 ENV APP_CONFIG /app/auth-application.conf
 
 ENTRYPOINT java -Dconfig.file=$APP_CONFIG -cp /app/auth-app.jar auth.AuthMain

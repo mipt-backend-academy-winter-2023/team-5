@@ -13,9 +13,8 @@ WORKDIR /app
 COPY --from=builder /app/routing/target/scala-2.13/routing-app_2.13-1.0.jar /app/routing-app.jar
 COPY --from=builder /app/routing/src/main/resources/application.conf /app/rounting-application.conf
 
-EXPOSE 8080
+EXPOSE 8081
 
-ENV APP_ENV production
 ENV APP_CONFIG /app/routing-application.conf
 
 ENTRYPOINT java -Dconfig.file=$APP_CONFIG -cp /app/route-app.jar routing.RountingMain
