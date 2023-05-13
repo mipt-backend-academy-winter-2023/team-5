@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  auth_app:
+    build:
+      context: .
+      dockerfile: Dockerfile-auth
+    container_name: auth_app
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      - APP_CONFIG=/app/auth-application.conf
+  routing_app:
+    build:
+      context: .
+      dockerfile: Dockerfile-routing
+    container_name: routing_app
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"
+    environment:
+      - APP_CONFIG=/app/routing-application.conf
