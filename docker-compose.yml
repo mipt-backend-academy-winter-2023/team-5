@@ -23,3 +23,14 @@ services:
       - "8081"
     environment:
       - APP_CONFIG=/app/routing-application.conf
+  database:
+    image: "postgres"
+    env_file:
+      - database.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+volumes:
+  database-data:
