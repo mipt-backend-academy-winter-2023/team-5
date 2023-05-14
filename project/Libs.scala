@@ -3,7 +3,7 @@ import sbt._
 object V {
   val circe_version = "0.14.1"
   val flyway = "9.16.0"
-  val pdiJwt = "9.2.0"
+  val jwt = "9.2.0"
   val pureconfig = "0.17.2"
   val zio = "2.0.13"
   val zioHttp = "0.0.5"
@@ -20,7 +20,7 @@ object Libs {
   ).map(_ % V.circe_version)
 
   val pdiJwt: List[ModuleID] = List(
-    "com.github.jwt-scala" %% "jwt-core" % V.pdiJwt
+    "com.github.jwt-scala" %% "jwt-json4s-native" % V.jwt
   )
 
   val pureconfig: List[ModuleID] = List(

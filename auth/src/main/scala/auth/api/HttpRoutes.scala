@@ -11,8 +11,21 @@ import zio.http._
 import zio.http.model._
 import zio.CanFail.canFailAmbiguous1
 import zio.http.model.Status.{BadRequest, Created, Forbidden, Ok}
+import java.time.Clock
+import pdi.jwt.{JwtJson4s, JwtAlgorithm}, org.json4s._, org.json4s.JsonDSL.WithBigDecimal._
+import java.time.Instant
+
 
 object HttpRoutes {
+  private def generateJwtToken(login: String): String = {
+    val key = "secretKey"
+    val claim = JObject(("login", login), ("key", key))
+    val algo = JwtAlgorithm.HS256
+    JwtJson4s.encode(claim)
+    val token = JwtJson4s.encode(claim, key, algo)
+    token
+  }
+
   val app: HttpApp[UserRepository, Response] =
     Http.collectZIO[Request] {
       case req@Method.POST -> !! / "auth" / "register" =>
@@ -20,7 +33,7 @@ object HttpRoutes {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
           _ <- UserRepository.add(user)
-          _ <- ZIO.logInfo(s"Created new user $user")
+          _ <- ZIO.logInfo(s"Register $user")
         } yield ()).either.map {
           case Right(_) => Response.status(Created)
           case Left(_) => Response.status(BadRequest)
@@ -31,19 +44,18 @@ object HttpRoutes {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
           allFound <- UserRepository.find(user).runCollect.map(_.toArray)
-        } yield (allFound)).either.map {
+        } yield allFound).either.map {
           case Right(users) =>
             users match {
               case Array() => Response.status(Forbidden)
-              case htail => {
-                ZIO.logInfo(s"Signed in ${htail.head}")
-                Response.text(s"{\"token\": \"aaa\"}")
-              }
+              case arr =>
+                ZIO.logInfo(s"Login ${arr.head}")
+                Response.text(s"{\"token\": \"${generateJwtToken(arr.head.login)}\"}")
             }
           case Left(_) => Response.status(BadRequest)
         }
 
       case Method.GET -> !! / "auth" / "test" =>
-        ZIO.succeed(Response.status(Status.Ok))
+        ZIO.succeed(Response.status(Ok))
     }
 }
