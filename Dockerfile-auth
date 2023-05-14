@@ -5,6 +5,7 @@ WORKDIR /app
 COPY build.sbt .
 COPY project project
 COPY auth auth
+COPY repository repository
 
 RUN sbt clean
 RUN sbt assembly
@@ -14,8 +15,9 @@ FROM openjdk:8-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/auth/target/scala-2.13/*.jar /app/
-COPY --from=builder /app/auth/src/main/resources/application.conf /app/auth-application.conf
+COPY --from=builder /app/auth/src/main/resources/application.conf /app/auth/src/main/resources/application.conf
+COPY --from=builder /app/repository/src/main/resources/ /app/repository/src/main/resources/
 
 EXPOSE 8082
 
-ENTRYPOINT java -Dconfig.file=/app/auth-application.conf -cp /app/*.jar auth.AuthMain
+ENTRYPOINT java -cp /app/*.jar auth.AuthMain

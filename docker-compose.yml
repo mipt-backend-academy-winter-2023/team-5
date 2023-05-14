@@ -1,10 +1,21 @@
 version: "3.9"
 
 services:
+  database:
+    image: "postgres"
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: team5
+    ports:
+      - "5432:5432"
+
   auth_service:
     build:
       context: .
       dockerfile: Dockerfile-auth
+    depends_on:
+      - database
     ports:
       - "8082:8082"
 
@@ -12,5 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-routing
+    depends_on:
+      - database
     ports:
       - "8081:8081"

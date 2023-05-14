@@ -1,6 +1,10 @@
 package auth.api
 
-import zio.{ZIO, Task}
+import repository.db.Users
+import repository.model.User
+import repository.JwtUtils
+import repository.PasswordEncode
+import zio.{Task, ZIO}
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
@@ -16,25 +20,20 @@ object AuthorizationToken {
 }
 
 object HttpRoutes {
-  val app: HttpApp[Any, Response] =
+  val app: HttpApp[Users, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "auth" / "login" => {
-        req.body.asString.map(body =>
-          body.fromJson[UserCredentials] match {
-          case Left(_) => Response.status(Status.BadRequest)
-          case Right(data) => authenticate(data)
-        })
+        (for {
+          user <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
+          _ <- Users.login(User(user.login, PasswordEncode.encode(user.password)))
+        } yield (Response.json(AuthorizationToken(JwtUtils.generateJwt(User(user.login, user.password))).toJson)))
+          .orElseFail(Response.status(Status.BadRequest))
       }.orElseFail(Response.status(Status.BadRequest))
-      case req@Method.POST -> !! / "auth" / "register" => {
-        req.body.asString.map(body =>
-          body.fromJson[UserCredentials] match {
-            case Left(_) => Response.status(Status.Forbidden)
-            case Right(data) => Response.status(Status.Ok)
-          })
-      }.orElseFail(Response.status(Status.BadRequest))
+      case req@Method.POST -> !! / "auth" / "register" =>
+        (for {
+          user <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
+          _ <- Users.add(User(user.login, PasswordEncode.encode(user.password)))
+        } yield(Response.status(Status.Created)))
+          .orElseFail(Response.status(Status.BadRequest))
     }
-
-  private def authenticate(credentials: UserCredentials): Response = {
-    Response.json(AuthorizationToken("dummy-token").toJson)
-  }
 }
