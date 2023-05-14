@@ -1,20 +1,21 @@
-FROM hseeberger/scala-sbt:8u222_1.3.5_2.13.1 as builder
+FROM sbtscala/scala-sbt:eclipse-temurin-18.0.2.1_1_1.8.1_3.2.1 as builder
 
 WORKDIR /app
 
 COPY . .
 
-RUN sbt "project route" compile package
+RUN sbt clean
+RUN sbt assembly
 
 FROM openjdk:8-jre-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/routing/target/scala-2.13/routing-app_2.13-1.0.jar /app/routing-app.jar
-COPY --from=builder /app/routing/src/main/resources/application.conf /app/rounting-application.conf
+COPY --from=builder /app/routing/target/scala-2.13/*.jar /app/routing-app.jar
+COPY --from=builder /app/routing/src/main/resources/application.conf /app/routing-application.conf
 
 EXPOSE 8081
 
 ENV APP_CONFIG /app/routing-application.conf
 
-ENTRYPOINT java -Dconfig.file=$APP_CONFIG -cp /app/route-app.jar routing.RountingMain
+ENTRYPOINT java -Dconfig.file=$APP_CONFIG -cp /app/routing-app.jar routing.RoutingMain
