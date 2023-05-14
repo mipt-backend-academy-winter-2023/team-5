@@ -5,15 +5,10 @@ import model.JsonProtocol._
 import zio.ZIO
 import repo.UserRepository
 import io.circe.jawn.decode
-import io.circe.syntax.EncoderOps
-import zio._
 import zio.http._
 import zio.http.model._
-import zio.CanFail.canFailAmbiguous1
 import zio.http.model.Status.{BadRequest, Created, Forbidden, Ok}
-import java.time.Clock
 import pdi.jwt.{JwtJson4s, JwtAlgorithm}, org.json4s._, org.json4s.JsonDSL.WithBigDecimal._
-import java.time.Instant
 
 
 object HttpRoutes {
