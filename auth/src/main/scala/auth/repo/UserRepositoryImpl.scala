@@ -38,7 +38,7 @@ final class UserRepositoryImpl(
           )
         )
 
-    ZIO.logInfo(s"Query to insert customer is ${renderInsert(query)}") *>
+    ZIO.logInfo(s"Query to insert user is ${renderInsert(query)}") *>
       execute(query)
         .provideSomeLayer(driverLayer)
         .unit

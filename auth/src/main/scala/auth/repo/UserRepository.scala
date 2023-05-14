@@ -8,7 +8,7 @@ trait UserRepository {
 
   def find(user: User): ZStream[Any, Throwable, User]
 
-  def add(customer: User): ZIO[Any, Throwable, Unit]
+  def add(user: User): ZIO[Any, Throwable, Unit]
 }
 
 object UserRepository {

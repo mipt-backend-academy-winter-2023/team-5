@@ -15,7 +15,7 @@ import zio.http.model.Status.{BadRequest, Created, Forbidden, Ok}
 object HttpRoutes {
   val app: HttpApp[UserRepository, Response] =
     Http.collectZIO[Request] {
-      case req@Method.POST -> !! / "auth" / "login" =>
+      case req@Method.POST -> !! / "auth" / "register" =>
         (for {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
@@ -26,7 +26,7 @@ object HttpRoutes {
           case Left(_) => Response.status(BadRequest)
         }
 
-      case req@Method.POST -> !! / "auth" / "register" =>
+      case req@Method.POST -> !! / "auth" / "login" =>
         (for {
           bodyStr <- req.body.asString
           user <- ZIO.fromEither(decode[User](bodyStr)).tapError(e => ZIO.logError(e.getMessage))
