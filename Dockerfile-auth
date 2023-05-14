@@ -1,0 +1,21 @@
+FROM sbtscala/scala-sbt:eclipse-temurin-18.0.2.1_1_1.8.1_3.2.1 as builder
+
+WORKDIR /app
+
+COPY build.sbt .
+COPY project project
+COPY auth auth
+
+RUN sbt clean
+RUN sbt assembly
+
+FROM openjdk:8-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/auth/target/scala-2.13/*.jar /app/
+COPY --from=builder /app/auth/src/main/resources/application.conf /app/auth-application.conf
+
+EXPOSE 8082
+
+ENTRYPOINT java -Dconfig.file=/app/auth-application.conf -cp /app/*.jar auth.AuthMain

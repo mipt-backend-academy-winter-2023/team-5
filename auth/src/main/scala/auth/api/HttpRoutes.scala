@@ -21,7 +21,7 @@ object HttpRoutes {
       case req @ Method.POST -> !! / "auth" / "login" => {
         req.body.asString.map(body =>
           body.fromJson[UserCredentials] match {
-          case Left(_) => Response.status(Status.Forbidden)
+          case Left(_) => Response.status(Status.BadRequest)
           case Right(data) => authenticate(data)
         })
       }.orElseFail(Response.status(Status.BadRequest))

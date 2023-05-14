@@ -25,7 +25,6 @@ object MapPoint {
 object HttpRoutes {
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
-      // Ключиков нет в ямле, делать не буду ибо волк заходит в бар
       case req @ Method.POST -> !! / "route" / "search" => {
         req.body.asString.map(body =>
           body.fromJson[List[IdMapPoint]] match {
@@ -36,6 +35,6 @@ object HttpRoutes {
     }
 
   private def route(credentials: List[IdMapPoint]): Response = {
-    Response.json(List(MapPoint(IdMapPoint("Тутдым"), "сюдым"), MapPoint(IdMapPoint("чота там"), "кому то там")).toJson)
+    Response.json(List(MapPoint(IdMapPoint("31234"), "Кремль"), MapPoint(IdMapPoint("0"), "МФТИ")).toJson)
   }
 }

@@ -2,13 +2,15 @@ version: "3.9"
 
 services:
   auth_service:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-auth
     ports:
       - "8082:8082"
-    command: sbt "runMain auth.AuthMain"
 
   routing_service:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile-routing
     ports:
       - "8081:8081"
-    command: sbt "runMain routing.RoutingMain"
