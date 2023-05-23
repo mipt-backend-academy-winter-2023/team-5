@@ -5,7 +5,7 @@ import pureconfig.generic.auto.exportReader
 import zio.http.ServerConfig
 import zio.{ZLayer, http}
 
-case class ServiceConfig(host: String, port: Int)
+case class ServiceConfig(host: String, port: Int, secret: String)
 
 object ServiceConfig {
   private val source = ConfigSource.default.at("app").at("service-config")
@@ -17,4 +17,6 @@ object ServiceConfig {
       .default
       .binding(serviceConfig.host, serviceConfig.port)
   }
+
+  val secretKey: String = serviceConfig.secret
 }
