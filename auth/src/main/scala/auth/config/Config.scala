@@ -21,12 +21,10 @@ object Config {
   val connectionPoolConfigLive
   : ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
     ZLayer(
-      for {
-        serverConfig <- ZIO.service[DbConfig]
-      } yield (ConnectionPoolConfig(
-        serverConfig.url,
-        connProperties(serverConfig.user, serverConfig.password)
-      ))
+      ZIO.service[DbConfig].map { serverConfig =>
+        val connPropertiesConfig = connProperties(serverConfig.user, serverConfig.password)
+        ConnectionPoolConfig(serverConfig.url, connPropertiesConfig)
+      }
     )
 
   private def connProperties(user: String, password: String): Properties = {

@@ -50,8 +50,6 @@ ThisBuild / assemblyMergeStrategy := {
         MergeStrategy.discard
       case "services" :: xs =>
         MergeStrategy.filterDistinctLines
-      case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
-        MergeStrategy.filterDistinctLines
       case _ => MergeStrategy.first
     }
   case x => (ThisBuild / assemblyMergeStrategy).value(x)

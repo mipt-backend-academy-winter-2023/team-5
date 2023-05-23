@@ -17,8 +17,8 @@ final class UserRepositoryImpl(
         ZLayer.succeed(pool)
       )
 
-  def EncryptPassword(password: String): String = {
-    val crypt = java.security.MessageDigest.getInstance("SHA-1")
+  private def encryptPassword(password: String): String = {
+    val crypt = java.security.MessageDigest.getInstance("SHA-256")
     crypt.reset()
     crypt.update(password.getBytes("UTF-8"))
     java.util.Base64.getEncoder.encodeToString(crypt.digest())
@@ -28,7 +28,7 @@ final class UserRepositoryImpl(
     val selectAll =
       select(fLogin, fPassword)
         .from(users)
-        .where(fLogin === user.login && fPassword === EncryptPassword(user.password))
+        .where(fLogin === user.login && fPassword === encryptPassword(user.password))
 
     ZStream.fromZIO(
       ZIO.logInfo(s"Query to execute findAll is ${renderRead(selectAll)}")
@@ -41,7 +41,7 @@ final class UserRepositoryImpl(
         .values(
           (
             user.login,
-            EncryptPassword(user.password)
+            encryptPassword(user.password)
           )
         )
 

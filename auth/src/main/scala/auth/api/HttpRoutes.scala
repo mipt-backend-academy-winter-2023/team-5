@@ -2,18 +2,21 @@ package auth.api
 
 import model.User
 import model.JsonProtocol._
+import auth.config.ServiceConfig
 import zio.ZIO
 import repo.UserRepository
 import io.circe.jawn.decode
+import io.circe.syntax._
 import zio.http._
 import zio.http.model._
 import zio.http.model.Status.{BadRequest, Created, Forbidden, Ok}
 import pdi.jwt.{JwtJson4s, JwtAlgorithm}, org.json4s._, org.json4s.JsonDSL.WithBigDecimal._
 
 
+
 object HttpRoutes {
   private def generateJwtToken(login: String): String = {
-    val key = "secretKey"
+    val key = ServiceConfig.secretKey
     val claim = JObject(("login", login), ("key", key))
     val algo = JwtAlgorithm.HS256
     JwtJson4s.encode(claim)
@@ -43,9 +46,10 @@ object HttpRoutes {
           case Right(users) =>
             users match {
               case Array() => Response.status(Forbidden)
-              case arr =>
-                ZIO.logInfo(s"Login ${arr.head}")
-                Response.text(s"{\"token\": \"${generateJwtToken(arr.head.login)}\"}")
+              case Array(user) =>
+                ZIO.logInfo(s"Login $user")
+                Response.text(Map("token" -> generateJwtToken(user.login)).asJson.noSpaces)
+              case _ => Response.status(Forbidden)
             }
           case Left(_) => Response.status(BadRequest)
         }
