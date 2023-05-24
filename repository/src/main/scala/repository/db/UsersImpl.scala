@@ -55,7 +55,10 @@ final class UsersImpl(pool: ConnectionPool) extends UsersTable with Users {
       case Right(arr) => arr match {
         case Array() =>
           ZIO.fail(new Exception("User not exists"))
-        case _ => ZIO.succeed(true)
+        case Array(user) =>
+          ZIO.succeed(true)
+        case _ =>
+          ZIO.fail(new Exception("Exists several users"))
       }
       case Left(e) =>
         ZIO.fail(e)
