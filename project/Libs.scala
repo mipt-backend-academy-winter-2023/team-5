@@ -9,6 +9,8 @@ object V {
   val circe_version = "0.14.1"
   val pdiJwt = "9.2.0"
   val pureconfig = "0.17.3"
+
+  val postgres = "42.5.4"
 }
 
 
@@ -39,6 +41,6 @@ object Libs {
   )
 
   val postgres: List[ModuleID] = List(
-    "org.postgresql" % "postgresql" % "42.5.4"
+    "org.postgresql" % "postgresql" % V.postgres
   )
 }
