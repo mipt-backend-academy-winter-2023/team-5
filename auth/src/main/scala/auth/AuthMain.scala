@@ -6,7 +6,7 @@ import repository.db.UsersImpl
 import repository.flyway.FlywayAdapter
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault, http}
-import repository.{Config, Repository}
+import repository.Config
 import zio.sql.ConnectionPool
 
 object AuthMain extends ZIOAppDefault {
