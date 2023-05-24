@@ -11,7 +11,6 @@ import zio.sql.ConnectionPool
 
 object AuthMain extends ZIOAppDefault {
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-    println("Hello world 1")
     val server =
       for {
         flyway <- ZIO.service[FlywayAdapter.Service]
