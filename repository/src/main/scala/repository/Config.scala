@@ -7,8 +7,7 @@ import zio.{ULayer, ZIO, ZLayer}
 import zio.sql.ConnectionPoolConfig
 
 object Config {
-  private val basePath = "app"
-  private val source = ConfigSource.default.at(basePath)
+  private val source = ConfigSource.default.at("app")
 
   val dbLive: ULayer[DbConfig] = {
     ZLayer.fromZIO(
@@ -18,12 +17,12 @@ object Config {
 
   val connectionPoolLive: ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
     ZLayer(
-      for {
-        serverConfig <- ZIO.service[DbConfig]
-      } yield ConnectionPoolConfig(
-        serverConfig.url,
-        connProperties(serverConfig.user, serverConfig.password)
-      )
+        ZIO.service[DbConfig].map(
+            serverConfig => ConnectionPoolConfig(
+                serverConfig.url,
+                connProperties(serverConfig.user, serverConfig.password)
+            )
+        )
     )
 
   private def connProperties(user: String, password: String): Properties = {
