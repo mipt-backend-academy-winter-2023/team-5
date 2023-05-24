@@ -24,15 +24,19 @@ object HttpRoutes {
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "auth" / "login" => {
         (for {
-          user <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
-          _ <- Users.login(User(user.login, PasswordEncode.encode(user.password)))
-        } yield (Response.json(AuthorizationToken(JwtUtils.generateJwt(User(user.login, user.password))).toJson)))
+          user_cred <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
+          password_hash = PasswordEncode.encode(user_cred.password)
+          user = User(user_cred.login, password_hash)
+          _ <- Users.login(user)
+        } yield (Response.json(AuthorizationToken(JwtUtils.generateJwt(user)).toJson)))
           .orElseFail(Response.status(Status.BadRequest))
       }.orElseFail(Response.status(Status.BadRequest))
       case req@Method.POST -> !! / "auth" / "register" =>
         (for {
-          user <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
-          _ <- Users.add(User(user.login, PasswordEncode.encode(user.password)))
+          user_cred <- req.body.asString.map(body => body.fromJson[UserCredentials]).right
+          password_hash = PasswordEncode.encode(user_cred.password)
+          user = User(user_cred.login, password_hash)
+          _ <- Users.add(user)
         } yield(Response.status(Status.Created)))
           .orElseFail(Response.status(Status.BadRequest))
     }
