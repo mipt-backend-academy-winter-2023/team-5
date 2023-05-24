@@ -19,7 +19,7 @@ object Users {
     ZStream.serviceWithStream[Users](_.findByCredentials(user))
 
   def findByUsername(user: User): ZStream[Users, Throwable, User] =
-    ZStream.serviceWithStream[Users](_.findByCredentials(user))
+    ZStream.serviceWithStream[Users](_.findByUsername(user))
 
   def add(user: User): ZIO[Users, Throwable, Unit] =
     ZIO.serviceWithZIO[Users](_.add(user))

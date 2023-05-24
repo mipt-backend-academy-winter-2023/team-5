@@ -54,7 +54,7 @@ final class UsersImpl(pool: ConnectionPool) extends UsersTable with Users {
     findByCredentials(user).runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
         case Array() =>
-          ZIO.fail(new Exception("User exists"))
+          ZIO.fail(new Exception("User not exists"))
         case _ => ZIO.succeed(true)
       }
       case Left(e) =>
