@@ -1,25 +1,29 @@
 version: "3.9"
 
 services:
-  auth_app:
+  database:
+    image: "postgres"
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: team5
+    ports:
+      - "5432:5432"
+
+  auth_service:
     build:
       context: .
       dockerfile: Dockerfile-auth
-    container_name: auth_app
+    depends_on:
+      - database
     ports:
-      - "8080:8080"
-    expose:
-      - "8080"
-    environment:
-      - APP_CONFIG=/app/auth-application.conf
-  routing_app:
+      - "8082:8082"
+
+  routing_service:
     build:
       context: .
       dockerfile: Dockerfile-routing
-    container_name: routing_app
+    depends_on:
+      - database
     ports:
       - "8081:8081"
-    expose:
-      - "8081"
-    environment:
-      - APP_CONFIG=/app/routing-application.conf

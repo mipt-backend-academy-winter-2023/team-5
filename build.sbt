@@ -1,4 +1,4 @@
-import Dependencies.{Auth, Routing, Helper}
+import Dependencies.{Auth, Routing, Helper, Repository}
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
@@ -23,13 +23,15 @@ lazy val auth = (project in file("auth"))
   .settings(
     name := "project-auth",
     libraryDependencies ++= Auth.dependencies
-  )
+  ).aggregate(repository
+  ).dependsOn(repository)
 
 lazy val routing = (project in file("routing"))
   .settings(
     name := "project-routing",
     libraryDependencies ++= Routing.dependencies
-  )
+  ).aggregate(repository
+  ).dependsOn(repository)
 
 lazy val helper = (project in file("helper"))
   .settings(
@@ -37,7 +39,28 @@ lazy val helper = (project in file("helper"))
     libraryDependencies ++= Helper.dependencies
   )
 
+lazy val repository = (project in file("repository"))
+  .settings(
+    name := "project-repository",
+    libraryDependencies ++= Repository.dependencies
+  )
+
 ThisBuild / assemblyMergeStrategy := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case PathList("META-INF", xs@_*) =>
+    (xs map {
+      _.toLowerCase
+    }) match {
+      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) =>
+        MergeStrategy.discard
+      case ps@(x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
+        MergeStrategy.discard
+      case "plexus" :: xs =>
+        MergeStrategy.discard
+      case "services" :: xs =>
+        MergeStrategy.filterDistinctLines
+      case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+        MergeStrategy.filterDistinctLines
+      case _ => MergeStrategy.first
+    }
   case x => (ThisBuild / assemblyMergeStrategy).value(x)
 }

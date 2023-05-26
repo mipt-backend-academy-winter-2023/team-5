@@ -18,4 +18,8 @@ object Dependencies {
   object Helper extends Dependencies {
     override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig).flatten
   }
+
+  object Repository extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig, flyway, circe, pdiJwt, postgres).flatten
+  }
 }
