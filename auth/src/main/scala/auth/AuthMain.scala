@@ -1,14 +1,12 @@
 package auth
 
-import api.HttpRoutes
+import auth.api.HttpRoutes
 import auth.config.ServiceConfig
 import repository.Config
-import zio.http.Server
-import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault, http}
 import repository.db.UsersImpl
 import repository.flyway.FlywayAdapter
-
-import zio.sql.ConnectionPool
+import zio.http.Server
+import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object AuthMain extends ZIOAppDefault {
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
@@ -17,7 +15,7 @@ object AuthMain extends ZIOAppDefault {
         flyway <- ZIO.service[FlywayAdapter.Service]
         _ <- flyway.migration
         _ <- zio.http.Server.serve(HttpRoutes.app)
-      } yield()
+      } yield ()
     server.provide(
       Server.live,
       ServiceConfig.live,

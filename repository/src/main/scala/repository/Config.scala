@@ -1,10 +1,11 @@
 package repository
 
-import java.util.Properties
-import pureconfig.{ConfigSource, ConfigReader}
+import pureconfig.ConfigSource
 import pureconfig.generic.auto.exportReader
-import zio.{ULayer, ZIO, ZLayer}
 import zio.sql.ConnectionPoolConfig
+import zio.{ULayer, ZIO, ZLayer}
+
+import java.util.Properties
 
 case class DbConfig(url: String, user: String, password: String)
 
@@ -19,12 +20,14 @@ object Config {
 
   val connectionPoolLive: ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
     ZLayer(
-      ZIO.service[DbConfig].map(
-        serverConfig => ConnectionPoolConfig(
-          serverConfig.url,
-          connProperties(serverConfig.user, serverConfig.password)
+      ZIO
+        .service[DbConfig]
+        .map(serverConfig =>
+          ConnectionPoolConfig(
+            serverConfig.url,
+            connProperties(serverConfig.user, serverConfig.password)
+          )
         )
-      )
     )
 
   private def connProperties(user: String, password: String): Properties = {

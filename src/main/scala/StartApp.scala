@@ -1,5 +1,4 @@
 import auth.AuthMain
-import helper.HelperMain
 import routing.RoutingMain
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 

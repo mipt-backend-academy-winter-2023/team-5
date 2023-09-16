@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 object V {
   val zio = "2.0.13"
@@ -13,7 +13,6 @@ object V {
   val postgres = "42.5.4"
   val locationtechjts = "1.19.0"
 }
-
 
 object Libs {
 
@@ -45,5 +44,7 @@ object Libs {
     "org.postgresql" % "postgresql" % V.postgres
   )
 
-  val locationtechjts = List("org.locationtech.jts" % "jts-core" % V.locationtechjts)
+  val locationtechjts = List(
+    "org.locationtech.jts" % "jts-core" % V.locationtechjts
+  )
 }
