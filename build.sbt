@@ -1,4 +1,4 @@
-import Dependencies.{Auth, Routing, Helper, Repository}
+import Dependencies.{Auth, Routing, Helper, Repository, MapRepository}
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
@@ -31,7 +31,7 @@ lazy val routing = (project in file("routing"))
     name := "project-routing",
     libraryDependencies ++= Routing.dependencies
   ).aggregate(repository
-  ).dependsOn(repository)
+  ).dependsOn(repository, map_repository)
 
 lazy val helper = (project in file("helper"))
   .settings(
@@ -43,6 +43,12 @@ lazy val repository = (project in file("repository"))
   .settings(
     name := "project-repository",
     libraryDependencies ++= Repository.dependencies
+  )
+
+lazy val map_repository = (project in file("map_repository"))
+  .settings(
+    name := "map_repository",
+    libraryDependencies ++= MapRepository.dependencies
   )
 
 ThisBuild / assemblyMergeStrategy := {

@@ -1,4 +1,4 @@
-package repository
+package map_repository
 
 import java.util.Properties
 import pureconfig.{ConfigSource, ConfigReader}
@@ -6,10 +6,13 @@ import pureconfig.generic.auto.exportReader
 import zio.{ULayer, ZIO, ZLayer}
 import zio.sql.ConnectionPoolConfig
 
-case class DbConfig(url: String, user: String, password: String)
-
+case class DbConfig(
+                     url: String,
+                     user: String,
+                     password: String
+                   )
 object Config {
-  private val source = ConfigSource.default.at("app").at("biba")
+  private val source = ConfigSource.default.at("app").at("map-db-config")
 
   val dbLive: ULayer[DbConfig] = {
     ZLayer.fromZIO(

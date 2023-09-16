@@ -6,11 +6,8 @@ import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 object StartApp extends ZIOAppDefault {
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] =
     for {
-      routing <- RoutingMain.run.fork
-      helper <- HelperMain.run.fork
       auth <- AuthMain.run.fork
-      _ <- helper.join
-      _ <- auth.join
-      _ <- routing.join
+      routing <- RoutingMain.run.fork
+      _ <- auth.join *> routing.join *> ZIO.never
     } yield ()
 }

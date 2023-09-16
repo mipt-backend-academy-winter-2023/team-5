@@ -11,6 +11,7 @@ object V {
   val pureconfig = "0.17.3"
 
   val postgres = "42.5.4"
+  val locationtechjts = "1.19.0"
 }
 
 
@@ -43,4 +44,6 @@ object Libs {
   val postgres: List[ModuleID] = List(
     "org.postgresql" % "postgresql" % V.postgres
   )
+
+  val locationtechjts = List("org.locationtech.jts" % "jts-core" % V.locationtechjts)
 }

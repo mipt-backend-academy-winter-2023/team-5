@@ -1,5 +1,7 @@
-import Libs._
-import sbt._
+import Libs.*
+import sbt.*
+
+import scala.collection.Seq
 
 trait Dependencies {
   def dependencies: Seq[ModuleID]
@@ -21,5 +23,9 @@ object Dependencies {
 
   object Repository extends Dependencies {
     override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig, flyway, circe, pdiJwt, postgres).flatten
+  }
+
+  object MapRepository extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig, flyway, circe, pdiJwt, postgres, locationtechjts).flatten
   }
 }

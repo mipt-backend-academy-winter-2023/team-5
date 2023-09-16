@@ -2,11 +2,12 @@ package auth
 
 import api.HttpRoutes
 import auth.config.ServiceConfig
-import repository.db.UsersImpl
-import repository.flyway.FlywayAdapter
+import repository.Config
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault, http}
-import repository.Config
+import repository.db.UsersImpl
+import repository.flyway.FlywayAdapter
+
 import zio.sql.ConnectionPool
 
 object AuthMain extends ZIOAppDefault {

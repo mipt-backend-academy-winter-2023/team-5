@@ -1,7 +1,7 @@
-package repository.flyway
+package map_repository.flyway
 
+import map_repository.DbConfig
 import org.flywaydb.core.Flyway
-import repository.DbConfig
 import zio.{UIO, ZIO, ZLayer}
 
 object FlywayAdapter {
@@ -16,7 +16,7 @@ class FlywayAdapterImpl(dbConfig: DbConfig) extends FlywayAdapter.Service {
   val flyway: UIO[Flyway] = ZIO.succeed(
     Flyway
       .configure()
-      .locations("classpath:db/migration")
+      .locations("classpath:map/migration")
       .dataSource(dbConfig.url, dbConfig.user, dbConfig.password)
   ).map(new Flyway(_))
 

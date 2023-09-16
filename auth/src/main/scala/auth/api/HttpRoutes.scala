@@ -1,9 +1,8 @@
 package auth.api
 
+import repository.{JwtUtils, PasswordEncode}
 import repository.db.Users
 import repository.model.User
-import repository.JwtUtils
-import repository.PasswordEncode
 import zio.{Task, ZIO}
 import zio.http._
 import zio.http.model.{Method, Status}
