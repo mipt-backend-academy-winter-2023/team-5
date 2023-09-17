@@ -31,7 +31,10 @@ object HttpRoutes {
           body.fromJson[List[IdMapPoint]] match {
             case Left(_) => Response.status(Status.Forbidden)
             case Right(data) => data match {
-              case List(_, _) => route(data)
+              case List(_, _) => {
+                CityGraphImpl.loadGraph()
+                route(data)
+              }
               case _ => Response.status(Status.BadRequest)
             }
           })
@@ -39,7 +42,6 @@ object HttpRoutes {
     }
 
   private def route(credentials: List[IdMapPoint]): Response = {
-    CityGraphImpl.searchRoute(credentials.head.value, credentials.apply(1).value)
     Response.json(
       CityGraphImpl
         .searchRoute(credentials.head.value, credentials.apply(1).value)

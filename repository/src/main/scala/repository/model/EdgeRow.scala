@@ -1,3 +1,3 @@
 package repository.model
 
-case class EdgeRow(id: Int, name: String, from: Int, to: Int)
+case class EdgeRow(id: Int, name: String, fromId: Int, toId: Int)
