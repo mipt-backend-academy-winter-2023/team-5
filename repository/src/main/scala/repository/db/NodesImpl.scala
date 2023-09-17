@@ -13,6 +13,7 @@ final class NodesImpl(pool: ConnectionPool) extends NodesTable with Nodes {
   override def getAll(): ZStream[Any, Throwable, NodeRow] = {
     val selectAll = select(fId, fName, fLatitude, fLongitude, fNodeType)
       .from(nodesTable)
+      .where(fId > 0)
     ZStream.fromZIO(
       ZIO.logInfo(s"Query to execute getAll is ${renderRead(selectAll)}")
     ) *> execute(selectAll.to((NodeRow.apply _).tupled)).provideSomeLayer(driverLayer)

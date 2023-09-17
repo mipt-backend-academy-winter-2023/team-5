@@ -80,9 +80,8 @@ class CityGraphImpl extends CityGraph {
           ZIO.fail(new Exception("No nodes"))
         case _ =>
           _nodes = arr.map(node => node.nodeType match {
-            case 0 => (node.id, new House(node.id, GeoPoint(node.latitude, node.longitude), node.name))
-            case _ => (node.id, new CrossRoad(node.id, GeoPoint(node.latitude, node.longitude), node.name.get))
-            // case _ => () // - exception
+            case 0 => (node.id, new House(node.id, GeoPoint(node.latitude, node.longitude), Some(node.name)))
+            case _ => (node.id, new CrossRoad(node.id, GeoPoint(node.latitude, node.longitude), node.name))
           }).toMap
           ZIO.succeed()
       }
@@ -97,7 +96,7 @@ class CityGraphImpl extends CityGraph {
         case Array() =>
           ZIO.fail(new Exception("No edges"))
         case _ =>
-          _edges = arr.map(edge => (_nodes(edge.from), _nodes(edge.to), Road(edge.id, edge.name))).toSet
+          _edges = arr.map(edge => (_nodes(edge.fromId), _nodes(edge.toId), Road(edge.id, edge.name))).toSet
           ZIO.succeed()
       }
       case Left(e) =>
