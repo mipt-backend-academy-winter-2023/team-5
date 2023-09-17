@@ -1,5 +1,6 @@
 package routing.api
 
+import map_repository.cache.MapInfo
 import map_repository.db.Points
 import zio.ZIO
 import zio.http._
@@ -28,14 +29,13 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val app: HttpApp[Points, Response] =
+  val app: HttpApp[Points with MapInfo.Service, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
         (for {
           list_data <- req.body.asString
             .map(body => body.fromJson[List[IdMapPoint]])
             .right
-          _ <- Points.foo()
           result <- route(list_data)
         } yield (result)).orElseFail(Response.status(Status.BadRequest))
         // (for {
@@ -60,16 +60,14 @@ object HttpRoutes {
 
   private def route(
       credentials: List[IdMapPoint]
-  ): ZIO[Points, Throwable, Response] = {
-    println("route")
-    println(Points.toString)
-
+  ): ZIO[Points with MapInfo.Service, Throwable, Response] = {
     (for {
-      x <- Points.foo()
-      points <- Points.getAll().runCollect.map(_.toArray)
+      // points <- Points.getAll().runCollect.map(_.toArray)
+      points_2 <- MapInfo.Service.getPoints()
       // _ <- Points.getAll()
     } yield ({
-      println(points(0))
+      println(points_2)
+      // println(points(0))
 
       Response.json(
         List(

@@ -1,6 +1,7 @@
 package routing
 
 import map_repository.Config
+import map_repository.cache.MapInfo
 import map_repository.db.PointsImpl
 import map_repository.flyway.FlywayAdapter
 import routing.api.HttpRoutes
@@ -15,6 +16,7 @@ object RoutingMain extends ZIOAppDefault {
         _ <- ZIO.logInfo("Start Routing")
         flyway <- ZIO.service[FlywayAdapter.Service]
         _ <- flyway.migration
+
         _ <- zio.http.Server.serve(HttpRoutes.app)
       } yield ()
     server.provide(
@@ -24,7 +26,8 @@ object RoutingMain extends ZIOAppDefault {
       Config.connectionPoolLive,
       zio.sql.ConnectionPool.live,
       FlywayAdapter.live,
-      PointsImpl.live
+      PointsImpl.live,
+      MapInfo.live
     )
   }
 }

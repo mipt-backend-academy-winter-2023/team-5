@@ -16,11 +16,6 @@ class PointsImpl(pool: ConnectionPool) extends PointsTable with Points {
     ) *> execute(selectAll.to((Point.apply _).tupled))
       .provideSomeLayer(driverLayer)
   }
-
-  override def foo(): ZIO[Points, Throwable, Unit] = {
-    println("foo routing")
-    ZIO.succeed()
-  }
 }
 
 object PointsImpl {
