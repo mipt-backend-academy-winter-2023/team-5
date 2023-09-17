@@ -1,18 +1,14 @@
-package routing.types
+package routing.graph
+
+import repository.model.{EdgeRow, NodeRow}
+import zio.ZIO
+import zio.prelude.data.Optional.AllValuesAreNullable
+import zio.stream.ZStream
 
 import scala.collection.mutable
 
-case class GeoPoint(latitude: Double, longitude: Double)
 
-abstract class Node(val id: Int, val point: GeoPoint)
-
-class House(id: Int, point: GeoPoint, val address: String, val numberOfFloors: Int, val name: Option[String]) extends Node(id, point)
-
-class CrossRoad(id: Int, point: GeoPoint, val crossRoadName: String, val trafficLight: Boolean) extends Node(id, point)
-
-case class Road(id: Int, name: String)
-
-class CityGraph {
+final class CityGraphImpl extends CityGraph {
   private var _nodes: Map[Int, Node] = Map()
   private var _edges: Set[(Node, Node, Road)] = Set()
 
@@ -76,15 +72,35 @@ class CityGraph {
     Nil
   }
 
-  def nodes: Set[Node] = _nodes.values.toSet
-
-  def edges: Set[(Node, Node, Road)] = _edges
-
-  def addNode(node: Node): Unit = {
-    _nodes = _nodes + (node.id -> node)
+  def loadNodes(nodeStream: ZStream[Any, Throwable, NodeRow]): ZIO[Any, Throwable, Unit] = {
+    nodeStream.runCollect.map(_.toArray).either.flatMap{
+      case Right(arr) => arr match {
+        case Array() =>
+          ZIO.fail(new Exception("No nodes"))
+        case _ =>
+          _nodes = arr.map(node => node.nodeType match {
+            case 0 => (node.id, new House(node.id, GeoPoint(node.latitude, node.longitude), node.name))
+            case _ => (node.id, new CrossRoad(node.id, GeoPoint(node.latitude, node.longitude), node.name.get))
+            // case _ => () // - exception
+          }).toMap
+          ZIO.succeed()
+      }
+      case Left(e) =>
+        ZIO.fail(e)
+    }
   }
 
-  def addEdge(from: Node, to: Node, road: Road): Unit = {
-    _edges = _edges + ((from, to, road))
+  def loadEdges(edgeStream: ZStream[Any, Throwable, EdgeRow]): ZIO[Any, Throwable, Unit] = {
+    edgeStream.runCollect.map(_.toArray).either.flatMap {
+      case Right(arr) => arr match {
+        case Array() =>
+          ZIO.fail(new Exception("No edges"))
+        case _ =>
+          _edges = arr.map(edge => (_nodes(edge.from), _nodes(edge.to), Road(edge.id, edge.name))).toSet
+          ZIO.succeed()
+      }
+      case Left(e) =>
+        ZIO.fail(e)
+    }
   }
 }

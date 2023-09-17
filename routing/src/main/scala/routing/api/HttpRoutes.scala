@@ -1,10 +1,15 @@
 package routing.api
 
+<<<<<<< HEAD
 import map_repository.cache.MapInfo
 import map_repository.db.Points
 import map_repository.model.Point
 import routing.graph.AStar
 import zio.ZIO
+=======
+import routing.graph.CityGraphImpl
+import zio.{Task, ZIO}
+>>>>>>> 81b78d5 (beta version)
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
@@ -15,7 +20,7 @@ object AuthorizationToken {
     DeriveJsonEncoder.gen[AuthorizationToken]
 }
 
-case class IdMapPoint(value: String)
+case class IdMapPoint(value: Int)
 object IdMapPoint {
   implicit val encoder: JsonEncoder[IdMapPoint] =
     DeriveJsonEncoder.gen[IdMapPoint]
