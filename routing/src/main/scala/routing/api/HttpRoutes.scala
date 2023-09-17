@@ -24,8 +24,6 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val graph = new CityGraphImpl()
-
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
@@ -41,7 +39,12 @@ object HttpRoutes {
     }
 
   private def route(credentials: List[IdMapPoint]): Response = {
-    graph
-    Response.json(List(MapPoint(IdMapPoint(31234), "Кремль"), MapPoint(IdMapPoint(0), "МФТИ")).toJson)
+    CityGraphImpl.searchRoute(credentials.head.value, credentials.apply(1).value)
+    Response.json(
+      CityGraphImpl
+        .searchRoute(credentials.head.value, credentials.apply(1).value)
+        .map(node => MapPoint(IdMapPoint(node.id), node.name.getOrElse("")))
+        .toJson
+    )
   }
 }

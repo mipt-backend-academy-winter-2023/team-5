@@ -1,5 +1,6 @@
 package routing.graph
 
+import repository.db.{Edges, Nodes}
 import repository.model.{EdgeRow, NodeRow}
 import zio.ZIO
 import zio.prelude.data.Optional.AllValuesAreNullable
@@ -8,7 +9,7 @@ import zio.stream.ZStream
 import scala.collection.mutable
 
 
-final class CityGraphImpl extends CityGraph {
+class CityGraphImpl extends CityGraph {
   private var _nodes: Map[Int, Node] = Map()
   private var _edges: Set[(Node, Node, Road)] = Set()
 
@@ -72,7 +73,7 @@ final class CityGraphImpl extends CityGraph {
     Nil
   }
 
-  def loadNodes(nodeStream: ZStream[Any, Throwable, NodeRow]): ZIO[Any, Throwable, Unit] = {
+  def loadNodes(nodeStream: ZStream[Nodes, Throwable, NodeRow]): ZIO[Nodes, Throwable, Unit] = {
     nodeStream.runCollect.map(_.toArray).either.flatMap{
       case Right(arr) => arr match {
         case Array() =>
@@ -90,7 +91,7 @@ final class CityGraphImpl extends CityGraph {
     }
   }
 
-  def loadEdges(edgeStream: ZStream[Any, Throwable, EdgeRow]): ZIO[Any, Throwable, Unit] = {
+  def loadEdges(edgeStream: ZStream[Edges, Throwable, EdgeRow]): ZIO[Edges, Throwable, Unit] = {
     edgeStream.runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
         case Array() =>
@@ -102,5 +103,15 @@ final class CityGraphImpl extends CityGraph {
       case Left(e) =>
         ZIO.fail(e)
     }
+  }
+}
+object CityGraphImpl {
+  val graph = new CityGraphImpl();
+  def loadGraph(): ZIO[Edges with Nodes, Throwable, Unit] = {
+    graph.loadNodes(Nodes.getAll()).&>(graph.loadEdges(Edges.getAll()))
+  }
+
+  def searchRoute(startId: Int, goalId: Int): List[Node] = {
+    graph.searchRoute(startId, goalId)
   }
 }
