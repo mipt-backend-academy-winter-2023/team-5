@@ -7,11 +7,12 @@ import map_repository.db.{EdgesImpl, PointsImpl}
 import map_repository.flyway.FlywayAdapter
 =======
 import repository.Config
-import repository.db.{EdgesImpl, NodesImpl}
+import repository.db.{EdgesImpl, Nodes, NodesImpl}
 import repository.flyway.FlywayAdapter
 >>>>>>> 81b78d5 (beta version)
 import routing.api.HttpRoutes
 import routing.config.ServiceConfig
+import routing.graph.CityGraphImpl
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
@@ -23,6 +24,7 @@ object RoutingMain extends ZIOAppDefault {
         flyway <- ZIO.service[FlywayAdapter.Service]
         _ <- flyway.migration
         _ <- zio.http.Server.serve(HttpRoutes.app)
+        _ <- CityGraphImpl.loadGraph()
       } yield ()
     server.provide(
       Server.live,
