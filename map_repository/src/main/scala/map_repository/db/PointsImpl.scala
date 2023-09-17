@@ -9,7 +9,6 @@ class PointsImpl(pool: ConnectionPool) extends PointsTable with Points {
     ZLayer.make[SqlDriver](SqlDriver.live, ZLayer.succeed(pool))
 
   override def getAll(): ZStream[Points, Throwable, Point] = {
-    println("get all")
     val selectAll = select(id, name, x, y).from(pointsTable)
     ZStream.fromZIO(
       ZIO.logInfo(s"Query to execute findAll is ${renderRead(selectAll)}")

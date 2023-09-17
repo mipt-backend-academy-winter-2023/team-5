@@ -2,7 +2,7 @@ package routing
 
 import map_repository.Config
 import map_repository.cache.MapInfo
-import map_repository.db.PointsImpl
+import map_repository.db.{EdgesImpl, PointsImpl}
 import map_repository.flyway.FlywayAdapter
 import routing.api.HttpRoutes
 import routing.config.ServiceConfig
@@ -27,6 +27,7 @@ object RoutingMain extends ZIOAppDefault {
       zio.sql.ConnectionPool.live,
       FlywayAdapter.live,
       PointsImpl.live,
+      EdgesImpl.live,
       MapInfo.live
     )
   }

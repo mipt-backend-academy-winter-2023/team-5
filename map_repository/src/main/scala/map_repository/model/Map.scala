@@ -4,8 +4,7 @@ case class Street(id: Int, name: String)
 case class Point(id: Int, name: String, x: Float, y: Float)
 case class Edge(
     id: Int,
-    intersectionFrom: Int,
-    intersectionTo: Int,
+    pointFrom: Int,
+    pointTo: Int,
     streetId: Int,
-    geom: String
 )

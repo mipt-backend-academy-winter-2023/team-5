@@ -2,6 +2,7 @@ package routing.api
 
 import map_repository.cache.MapInfo
 import map_repository.db.Points
+import routing.graph.AStar
 import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
@@ -38,23 +39,6 @@ object HttpRoutes {
             .right
           result <- route(list_data)
         } yield (result)).orElseFail(Response.status(Status.BadRequest))
-        // (for {
-        //   x <- Points.foo()
-        //   // _ <- Points.getAll()
-        // } yield (Response.json(
-        //   List(
-        //     MapPoint(IdMapPoint("31234"), "Кремль"),
-        //     MapPoint(IdMapPoint("0"), "МФТИ")
-        //   ).toJson
-        // ))).orElseFail(Response.status(Status.BadRequest))
-        // {
-        //   req.body.asString.map(body =>
-        //     body.fromJson[List[IdMapPoint]] match {
-        //       // case Left(_)     => Response.status(Status.Forbidden)
-        //       case Right(data) => route(data)
-        //     }
-        //   )
-        // }.orElseFail(Response.status(Status.BadRequest))
       }
     }
 
@@ -62,29 +46,26 @@ object HttpRoutes {
       credentials: List[IdMapPoint]
   ): ZIO[Points with MapInfo.Service, Throwable, Response] = {
     (for {
-      // points <- Points.getAll().runCollect.map(_.toArray)
-      points_2 <- MapInfo.Service.getPoints()
-      // _ <- Points.getAll()
+      points <- MapInfo.Service.getPoints()
+      edges <- MapInfo.Service
+        .getEdges()
+        .map(_.groupBy(_.pointFrom).map { case (k, v) =>
+          k -> v.map(_.pointTo)
+        })
     } yield ({
-      println(points_2)
-      // println(points(0))
+      println(points(0))
+      println(edges)
 
       Response.json(
-        List(
-          MapPoint(IdMapPoint("31234"), "Кремль"),
-          MapPoint(IdMapPoint("0"), "МФТИ")
-        ).toJson
+        AStar
+          .aStar(
+            points(credentials.head.value.toInt),
+            points(credentials(1).value.toInt),
+            points,
+            edges
+          )
+          .toJson
       )
     }))
-
-    // Points.getAll().runCollect.map(_.toArray).either.flatMap({
-    //   case Right(arr) =>
-    //     println(arr)
-    //     ZIO.fail(new Exception("Biba"))
-    //   case Left(e) =>
-    //     ZIO.fail(e)
-    // })
-    // take(1).map(p => println(p.toString))
-
   }
 }
