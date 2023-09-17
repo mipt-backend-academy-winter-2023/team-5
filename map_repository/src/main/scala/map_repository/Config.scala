@@ -7,24 +7,24 @@ import zio.{ULayer, ZIO, ZLayer}
 
 import java.util.Properties
 
-case class DbConfig(
+case class MapDbConfig(
     url: String,
     user: String,
     password: String
 )
 object Config {
-  private val source = ConfigSource.default.at("app").at("map-db-config")
+  private val source = ConfigSource.default.at("app").at("map")
 
-  val dbLive: ULayer[DbConfig] = {
+  val dbLive: ULayer[MapDbConfig] = {
     ZLayer.fromZIO(
-      ZIO.attempt(source.loadOrThrow[DbConfig]).orDie
+      ZIO.attempt(source.loadOrThrow[MapDbConfig]).orDie
     )
   }
 
-  val connectionPoolLive: ZLayer[DbConfig, Throwable, ConnectionPoolConfig] =
+  val connectionPoolLive: ZLayer[MapDbConfig, Throwable, ConnectionPoolConfig] =
     ZLayer(
       ZIO
-        .service[DbConfig]
+        .service[MapDbConfig]
         .map(serverConfig =>
           ConnectionPoolConfig(
             serverConfig.url,

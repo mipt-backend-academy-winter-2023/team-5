@@ -42,9 +42,6 @@ object Libs {
 
   val postgres: List[ModuleID] = List(
     "org.postgresql" % "postgresql" % V.postgres
-  )
-
-  val locationtechjts = List(
-    "org.locationtech.jts" % "jts-core" % V.locationtechjts
+    // "org.postgis" % "postgis-jdbc" % "1.3.3"
   )
 }

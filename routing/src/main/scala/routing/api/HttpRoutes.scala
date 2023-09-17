@@ -1,8 +1,11 @@
 package routing.api
 
+import map_repository.db.Points
+import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
+// import org.postgis.Point
 
 case class AuthorizationToken(token: String)
 object AuthorizationToken {
@@ -25,25 +28,65 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val app: HttpApp[Any, Response] =
+  val app: HttpApp[Points, Response] =
     Http.collectZIO[Request] {
-      case req @ Method.POST -> !! / "route" / "search" =>
-        {
-          req.body.asString.map(body =>
-            body.fromJson[List[IdMapPoint]] match {
-              case Left(_)     => Response.status(Status.Forbidden)
-              case Right(data) => route(data)
-            }
-          )
-        }.orElseFail(Response.status(Status.BadRequest))
+      case req @ Method.POST -> !! / "route" / "search" => {
+        (for {
+          list_data <- req.body.asString
+            .map(body => body.fromJson[List[IdMapPoint]])
+            .right
+          _ <- Points.foo()
+          result <- route(list_data)
+        } yield (result)).orElseFail(Response.status(Status.BadRequest))
+        // (for {
+        //   x <- Points.foo()
+        //   // _ <- Points.getAll()
+        // } yield (Response.json(
+        //   List(
+        //     MapPoint(IdMapPoint("31234"), "Кремль"),
+        //     MapPoint(IdMapPoint("0"), "МФТИ")
+        //   ).toJson
+        // ))).orElseFail(Response.status(Status.BadRequest))
+        // {
+        //   req.body.asString.map(body =>
+        //     body.fromJson[List[IdMapPoint]] match {
+        //       // case Left(_)     => Response.status(Status.Forbidden)
+        //       case Right(data) => route(data)
+        //     }
+        //   )
+        // }.orElseFail(Response.status(Status.BadRequest))
+      }
     }
 
-  private def route(credentials: List[IdMapPoint]): Response = {
-    Response.json(
-      List(
-        MapPoint(IdMapPoint("31234"), "Кремль"),
-        MapPoint(IdMapPoint("0"), "МФТИ")
-      ).toJson
-    )
+  private def route(
+      credentials: List[IdMapPoint]
+  ): ZIO[Points, Throwable, Response] = {
+    println("route")
+    println(Points.toString)
+
+    (for {
+      x <- Points.foo()
+      points <- Points.getAll().runCollect.map(_.toArray)
+      // _ <- Points.getAll()
+    } yield ({
+      println(points(0))
+
+      Response.json(
+        List(
+          MapPoint(IdMapPoint("31234"), "Кремль"),
+          MapPoint(IdMapPoint("0"), "МФТИ")
+        ).toJson
+      )
+    }))
+
+    // Points.getAll().runCollect.map(_.toArray).either.flatMap({
+    //   case Right(arr) =>
+    //     println(arr)
+    //     ZIO.fail(new Exception("Biba"))
+    //   case Left(e) =>
+    //     ZIO.fail(e)
+    // })
+    // take(1).map(p => println(p.toString))
+
   }
 }

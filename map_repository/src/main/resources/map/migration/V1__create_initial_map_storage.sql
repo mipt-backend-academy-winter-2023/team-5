@@ -1,21 +1,26 @@
--- Enable PostGIS extension on your database
-CREATE EXTENSION IF NOT EXISTS postgis;
+-- Не получилось, предлагаю показать как сделать запросы на лекции
+-- CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE streets (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255)
+    name VARCHAR(255) NOT NULL
 );
 
+-- Это просто геометки на карте, может дома, может перекрестки
 CREATE TABLE points (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    geom GEOMETRY(Point, 4326)
+    name VARCHAR(255) NOT NULL,
+
+    x FLOAT NOT NULL,
+    y FLOAT NOT NULL
+    -- geom GEOMETRY(Point, 4326)
+    -- у меня не получилось настроить запросы в scala в лекция тоже инфы не нашел
 );
 
+-- Это ребра между двумя точками, возможно не на улице, а путь от перекрестка до дома
 CREATE TABLE edges (
     id SERIAL PRIMARY KEY,
-    intersection_from INTEGER REFERENCES intersections(id),
-    intersection_to INTEGER REFERENCES intersections(id),
-    street_id INTEGER REFERENCES streets(id),
-    geom GEOMETRY(LineString, 4326)
+    point_from INTEGER REFERENCES points(id) NOT NULL,
+    point_to INTEGER REFERENCES points(id) NOT NULL,
+    street_id INTEGER REFERENCES streets(id)
 );

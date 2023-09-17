@@ -1,7 +1,8 @@
 package routing
 
-import repository.Config
-import repository.flyway.FlywayAdapter
+import map_repository.Config
+import map_repository.db.PointsImpl
+import map_repository.flyway.FlywayAdapter
 import routing.api.HttpRoutes
 import routing.config.ServiceConfig
 import zio.http.Server
@@ -21,7 +22,9 @@ object RoutingMain extends ZIOAppDefault {
       ServiceConfig.live,
       Config.dbLive,
       Config.connectionPoolLive,
-      FlywayAdapter.live
+      zio.sql.ConnectionPool.live,
+      FlywayAdapter.live,
+      PointsImpl.live
     )
   }
 }

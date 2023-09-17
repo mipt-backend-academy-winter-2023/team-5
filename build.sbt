@@ -32,8 +32,8 @@ lazy val routing = (project in file("routing"))
     name := "project-routing",
     libraryDependencies ++= Routing.dependencies
   )
-  .aggregate(repository)
-  .dependsOn(repository, map_repository)
+  .aggregate(map_repository)
+  .dependsOn(map_repository)
 
 lazy val helper = (project in file("helper"))
   .settings(
@@ -49,7 +49,7 @@ lazy val repository = (project in file("repository"))
 
 lazy val map_repository = (project in file("map_repository"))
   .settings(
-    name := "map_repository",
+    name := "map-repository",
     libraryDependencies ++= MapRepository.dependencies
   )
 

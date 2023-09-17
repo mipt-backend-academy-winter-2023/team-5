@@ -12,7 +12,8 @@ object Dependencies {
   }
 
   object Routing extends Dependencies {
-    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig).flatten
+    override def dependencies: Seq[ModuleID] =
+      Seq(zio, pureconfig, postgres).flatten
   }
 
   object Helper extends Dependencies {
@@ -31,8 +32,7 @@ object Dependencies {
       flyway,
       circe,
       pdiJwt,
-      postgres,
-      locationtechjts
+      postgres
     ).flatten
   }
 }
