@@ -21,7 +21,6 @@ object Libs {
     "dev.zio" %% "zio-sql-postgres" % V.zioSqlPostgres,
     "org.http4s" %% "http4s-dsl" % "0.23.18",
     "org.http4s" %% "http4s-blaze-server" % "0.23.14",
-//    "org.http4s" %% "http4s-zio" % "latestVersion",
     "org.http4s" %% "http4s-blaze-client" % "0.23.14"
   )
 
