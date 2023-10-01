@@ -18,7 +18,11 @@ object Libs {
   val zio: List[ModuleID] = List(
     "dev.zio" %% "zio" % V.zio,
     "dev.zio" %% "zio-http" % V.zioHttp,
-    "dev.zio" %% "zio-sql-postgres" % V.zioSqlPostgres
+    "dev.zio" %% "zio-sql-postgres" % V.zioSqlPostgres,
+    "org.http4s" %% "http4s-dsl" % "0.23.18",
+    "org.http4s" %% "http4s-blaze-server" % "0.23.14",
+//    "org.http4s" %% "http4s-zio" % "latestVersion",
+    "org.http4s" %% "http4s-blaze-client" % "0.23.14"
   )
 
   val pureconfig: List[ModuleID] = List(
