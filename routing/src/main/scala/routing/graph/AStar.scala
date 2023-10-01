@@ -12,8 +12,14 @@ object AStar {
     Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)).toFloat
   }
 
-  def aStar(start: Point, goal: Point, edges: Map[Point, List[Point]]): List[Point] = {
-    val openSet = mutable.PriorityQueue.empty[Node](Ordering.by[Node, Float](_.cost).reverse)
+  def aStar(
+      start: Point,
+      goal: Point,
+      edges: Map[Point, List[Point]]
+  ): List[Point] = {
+    val openSet = mutable.PriorityQueue.empty[Node](
+      Ordering.by[Node, Float](_.cost).reverse
+    )
     openSet.enqueue(Node(start, 0, None))
 
     val closedSet = mutable.Set.empty[Point]
@@ -36,9 +42,14 @@ object AStar {
 
       for (neighborPoint <- edges.getOrElse(current.point, List.empty)) {
         if (!closedSet.contains(neighborPoint)) {
-          val tentativeCost = current.cost + distance(current.point, neighborPoint)
+          val tentativeCost =
+            current.cost + distance(current.point, neighborPoint)
 
-          val neighborNode = Node(neighborPoint, tentativeCost + distance(neighborPoint, goal), Some(current))
+          val neighborNode = Node(
+            neighborPoint,
+            tentativeCost + distance(neighborPoint, goal),
+            Some(current)
+          )
 
           openSet.enqueue(neighborNode)
         }
@@ -48,4 +59,3 @@ object AStar {
     List.empty[Point]
   }
 }
-

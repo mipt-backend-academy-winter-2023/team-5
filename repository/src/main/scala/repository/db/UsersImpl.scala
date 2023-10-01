@@ -20,7 +20,6 @@ final class UsersImpl(pool: ConnectionPool) extends UsersTable with Users {
   }
 
   override def findByCredentials(user: User): ZStream[Any, Throwable, User] = {
-    println("find by credentials")
     val selectAll = select(username, password_hash)
       .from(userTable)
       .where(username === user.username && password_hash === user.password_hash)

@@ -6,5 +6,5 @@ case class Edge(
     id: Int,
     pointFrom: Int,
     pointTo: Int,
-    streetId: Int,
+    streetId: Int
 )

@@ -47,7 +47,7 @@ lazy val repository = (project in file("repository"))
     libraryDependencies ++= Repository.dependencies
   )
 
-lazy val map_repository = (project in file("map_repository"))
+lazy val map_repository = (project in file("map-repository"))
   .settings(
     name := "map-repository",
     libraryDependencies ++= MapRepository.dependencies

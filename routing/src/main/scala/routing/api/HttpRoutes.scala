@@ -2,12 +2,12 @@ package routing.api
 
 import map_repository.cache.MapInfo
 import map_repository.db.Points
+import map_repository.model.Point
 import routing.graph.AStar
 import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
-// import org.postgis.Point
 
 case class AuthorizationToken(token: String)
 object AuthorizationToken {
@@ -42,26 +42,29 @@ object HttpRoutes {
       }
     }
 
+  private def getPointById(id: Int, points: Array[Point]): Point = {
+    points.find(p => p.id == id).orNull
+  }
+
   private def route(
-      credentials: List[IdMapPoint]
+      routing_points: List[IdMapPoint]
   ): ZIO[Points with MapInfo.Service, Throwable, Response] = {
     (for {
       points <- MapInfo.Service.getPoints()
       edges <- MapInfo.Service
         .getEdges()
         .map(_.groupBy(_.pointFrom).map { case (k, v) =>
-          k -> v.map(_.pointTo)
+          getPointById(k, points) -> v
+            .map(_.pointTo)
+            .map(getPointById(_, points))
+            .toList
         })
     } yield ({
-      println(points(0))
-      println(edges)
-
       Response.json(
         AStar
           .aStar(
-            points(credentials.head.value.toInt),
-            points(credentials(1).value.toInt),
-            points,
+            getPointById(routing_points.head.value.toInt, points),
+            getPointById(routing_points(1).value.toInt, points),
             edges
           )
           .toJson

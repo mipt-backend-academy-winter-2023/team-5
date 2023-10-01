@@ -1,11 +1,11 @@
 package map_repository.db
 
 import map_repository.model.Edge
-import zio.{ZIO, ZLayer}
 import zio.schema.DeriveSchema
 import zio.sql.ConnectionPool
 import zio.sql.postgresql.PostgresJdbcModule
 import zio.stream.ZStream
+import zio.{ZIO, ZLayer}
 
 trait Edges {
   def getAll(): ZStream[Edges, Throwable, Edge]

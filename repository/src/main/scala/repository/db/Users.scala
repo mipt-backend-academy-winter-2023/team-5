@@ -12,8 +12,6 @@ trait Users {
   def add(user: User): ZIO[Users, Throwable, Unit]
 
   def login(user: User): ZIO[Users, Throwable, Unit]
-
-  def foo(): ZIO[Users, Throwable, Unit]
 }
 
 object Users {
