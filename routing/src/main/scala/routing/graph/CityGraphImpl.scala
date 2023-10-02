@@ -9,11 +9,8 @@ import zio.stream.ZStream
 import scala.collection.mutable
 
 
-class CityGraphImpl extends CityGraph {
-  private var _nodes: Map[Int, Node] = Map()
-  private var _edges: Set[(Node, Node, Road)] = Set()
-
-  private def haversineDistance(p1: GeoPoint, p2: GeoPoint): Double = {
+object CityGraphImpl {
+  def haversineDistance(p1: GeoPoint, p2: GeoPoint): Double = {
     val R = 6371000
     val dLat = (p2.latitude - p1.latitude).toRadians
     val dLon = (p2.longitude - p1.longitude).toRadians
@@ -26,7 +23,10 @@ class CityGraphImpl extends CityGraph {
     R * c
   }
 
-  def searchRoute(startId: Int, goalId: Int): List[Node] = {
+  def searchRoute(startId: Int, goalId: Int, graph: CityGraph): List[Node] = {
+    val _nodes = graph.nodes.nodes
+    val _edges = graph.edges.edges
+
     if (!_nodes.contains(startId) || !_nodes.contains(goalId)) {
       return Nil
     }
@@ -52,7 +52,7 @@ class CityGraphImpl extends CityGraph {
           tmp = cameFrom(tmp)
           path.prepend(tmp)
         }
-        return path.toList
+        path.toList
       }
 
       for (edge <- _edges.filter(e => e._1 == current || e._2 == current)) {
@@ -73,44 +73,46 @@ class CityGraphImpl extends CityGraph {
     Nil
   }
 
-  def loadNodes(nodeStream: ZStream[Nodes, Throwable, NodeRow]): ZIO[Nodes, Throwable, Unit] = {
-    nodeStream.runCollect.map(_.toArray).either.flatMap{
+  def loadNodes(): CityNodes = {
+    var cityNodes = CityNodes(Map())
+    Nodes.getAll().runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
         case Array() =>
-          ZIO.fail(new Exception("No nodes"))
+          throw new Exception("No nodes")
         case _ =>
-          _nodes = arr.map(node => node.nodeType match {
+          cityNodes = CityNodes(arr.map(node => node.nodeType match {
             case 0 => (node.id, new House(node.id, GeoPoint(node.latitude, node.longitude), Some(node.name)))
             case _ => (node.id, new CrossRoad(node.id, GeoPoint(node.latitude, node.longitude), node.name))
-          }).toMap
+          }).toMap)
           ZIO.succeed()
       }
       case Left(e) =>
-        ZIO.fail(e)
+        throw e
     }
+
+    cityNodes
   }
 
-  def loadEdges(edgeStream: ZStream[Edges, Throwable, EdgeRow]): ZIO[Edges, Throwable, Unit] = {
-    edgeStream.runCollect.map(_.toArray).either.flatMap {
+  def loadGraph(): CityGraph = {
+    val nodes = loadNodes()
+    var cityEdges = CityEdges(Set())
+
+    Edges.getAll().runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
         case Array() =>
-          ZIO.fail(new Exception("No edges"))
+          throw new Exception("No edges")
         case _ =>
-          _edges = arr.map(edge => (_nodes(edge.fromId), _nodes(edge.toId), Road(edge.id, edge.name))).toSet
+          cityEdges = CityEdges(arr
+            .map(edge => (nodes.nodes(edge.fromId), nodes.nodes(edge.toId), Road(edge.id, edge.name)))
+            .toSet
+          )
           ZIO.succeed()
       }
       case Left(e) =>
-        ZIO.fail(e)
+        throw e
     }
-  }
-}
-object CityGraphImpl {
-  val graph = new CityGraphImpl();
-  def loadGraph(): ZIO[Edges with Nodes, Throwable, Unit] = {
-    graph.loadNodes(Nodes.getAll()).&>(graph.loadEdges(Edges.getAll()))
+
+    CityGraph(nodes, cityEdges)
   }
 
-  def searchRoute(startId: Int, goalId: Int): List[Node] = {
-    graph.searchRoute(startId, goalId)
-  }
 }
