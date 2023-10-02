@@ -58,6 +58,10 @@ paths:
                   $ref: "#/components/schemas/MapPoint"
         '401':
           $ref: "#/components/responses/UserUnauthorized"
+        '400':
+          $ref: "#/components/responses/NoMapPoints"
+        '405':
+          $ref: "#/components/responses/UnsupportedNumberOfPoints"
       security:
         - bearerAuth: []
 
@@ -72,6 +76,10 @@ components:
       description: Не хватает логина или пароля
     LoginUnsuccessful:
       description: Неудачная авторизация
+    NoMapPoints:
+      description: Нет точек для маршрута
+    UnsupportedNumberOfPoints:
+      description: Больше 2х точек в маршруте не поддерживается
   schemas:
     AuthorizationToken:
       type: string

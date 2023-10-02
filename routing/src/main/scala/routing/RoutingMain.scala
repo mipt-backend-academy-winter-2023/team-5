@@ -16,7 +16,6 @@ object RoutingMain extends ZIOAppDefault {
         flyway <- ZIO.service[FlywayAdapter.Service]
         _ <- flyway.migration
         _ <- zio.http.Server.serve(HttpRoutes.app)
-        _ <- CityGraphImpl.loadGraph()
       } yield ()
     server.provide(
       Server.live,

@@ -24,6 +24,7 @@ object MapPoint {
 }
 
 object HttpRoutes {
+  private val cityGraph = CityGraphImpl.loadGraph()
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
@@ -31,20 +32,19 @@ object HttpRoutes {
           body.fromJson[List[IdMapPoint]] match {
             case Left(_) => Response.status(Status.Forbidden)
             case Right(data) => data match {
-              case List(_, _) => {
-                CityGraphImpl.loadGraph()
-                route(data)
-              }
-              case _ => Response.status(Status.BadRequest)
+              case List(start, end) =>
+                route(start, end)
+              case List(onePoint) =>
+                Response.json(MapPoint(onePoint, "").toJson)
+              case _ => Response.status(Status.MethodNotAllowed)
             }
           })
       }.orElseFail(Response.status(Status.BadRequest))
     }
 
-  private def route(credentials: List[IdMapPoint]): Response = {
+  private def route(startPoint: IdMapPoint, endPoint: IdMapPoint): Response = {
     Response.json(
-      CityGraphImpl
-        .searchRoute(credentials.head.value, credentials.apply(1).value)
+      CityGraphImpl.searchRoute(startPoint.value, endPoint.value, cityGraph)
         .map(node => MapPoint(IdMapPoint(node.id), node.name.getOrElse("")))
         .toJson
     )

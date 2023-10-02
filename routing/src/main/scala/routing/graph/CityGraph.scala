@@ -19,9 +19,8 @@ class CrossRoad(id: Int, point: GeoPoint, name: String)
 
 case class Road(id: Int, name: String)
 
-trait CityGraph {
-  def searchRoute(startId: Int, goalId: Int): List[Node]
-  def loadEdges(edgeStream: ZStream[Edges, Throwable, EdgeRow]): ZIO[Edges, Throwable, Unit]
-  def loadNodes(nodeStream: ZStream[Nodes, Throwable, NodeRow]): ZIO[Nodes, Throwable, Unit]
+case class CityNodes(nodes: Map[Int, Node])
 
-}
+case class CityEdges(edges: Set[(Node, Node, Road)])
+
+case class CityGraph(nodes: CityNodes, edges: CityEdges)
