@@ -1,5 +1,5 @@
-import Libs._
-import sbt._
+import Libs.*
+import sbt.*
 
 trait Dependencies {
   def dependencies: Seq[ModuleID]
@@ -12,7 +12,8 @@ object Dependencies {
   }
 
   object Routing extends Dependencies {
-    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig).flatten
+    override def dependencies: Seq[ModuleID] =
+      Seq(zio, pureconfig, postgres).flatten
   }
 
   object Helper extends Dependencies {
@@ -20,6 +21,18 @@ object Dependencies {
   }
 
   object Repository extends Dependencies {
-    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig, flyway, circe, pdiJwt, postgres).flatten
+    override def dependencies: Seq[ModuleID] =
+      Seq(zio, pureconfig, flyway, circe, pdiJwt, postgres).flatten
+  }
+
+  object MapRepository extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(
+      zio,
+      pureconfig,
+      flyway,
+      circe,
+      pdiJwt,
+      postgres
+    ).flatten
   }
 }

@@ -18,7 +18,7 @@ object PasswordEncode {
     hexString.toString
   }
 
-  def encode(password: String) : String = {
+  def encode(password: String): String = {
     sha256Hash(password)
   }
 }

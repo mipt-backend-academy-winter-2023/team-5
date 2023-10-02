@@ -1,7 +1,7 @@
 package repository.db
 
 import repository.model.User
-import zio.{Task, ZIO}
+import zio.ZIO
 import zio.stream.ZStream
 
 trait Users {

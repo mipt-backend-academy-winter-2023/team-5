@@ -1,4 +1,4 @@
-import sbt._
+import sbt.*
 
 object V {
   val zio = "2.0.13"
@@ -12,7 +12,6 @@ object V {
 
   val postgres = "42.5.4"
 }
-
 
 object Libs {
 

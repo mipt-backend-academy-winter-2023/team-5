@@ -1,7 +1,7 @@
-package repository.flyway
+package map_repository.flyway
 
+import map_repository.MapDbConfig
 import org.flywaydb.core.Flyway
-import repository.DbConfig
 import zio.{UIO, ZIO, ZLayer}
 
 object FlywayAdapter {
@@ -9,16 +9,16 @@ object FlywayAdapter {
     def migration: UIO[Unit]
   }
 
-  val live: ZLayer[DbConfig, Nothing, FlywayAdapterImpl] =
+  val live: ZLayer[MapDbConfig, Nothing, FlywayAdapterImpl] =
     ZLayer.fromFunction(new FlywayAdapterImpl(_))
 }
 
-class FlywayAdapterImpl(dbConfig: DbConfig) extends FlywayAdapter.Service {
+class FlywayAdapterImpl(dbConfig: MapDbConfig) extends FlywayAdapter.Service {
   val flyway: UIO[Flyway] = ZIO
     .succeed(
       Flyway
         .configure()
-        .locations("classpath:auth/migration")
+        .locations("classpath:map/migration")
         .dataSource(dbConfig.url, dbConfig.user, dbConfig.password)
     )
     .map(new Flyway(_))

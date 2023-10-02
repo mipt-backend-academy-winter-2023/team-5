@@ -1,4 +1,4 @@
-import Dependencies.{Auth, Routing, Helper, Repository}
+import Dependencies.*
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
@@ -11,27 +11,29 @@ lazy val root = (project in file("."))
   .aggregate(
     auth,
     routing,
-    helper,
+    helper
   )
   .dependsOn(
     auth,
     routing,
-    helper,
+    helper
   )
 
 lazy val auth = (project in file("auth"))
   .settings(
     name := "project-auth",
     libraryDependencies ++= Auth.dependencies
-  ).aggregate(repository
-  ).dependsOn(repository)
+  )
+  .aggregate(repository)
+  .dependsOn(repository)
 
 lazy val routing = (project in file("routing"))
   .settings(
     name := "project-routing",
     libraryDependencies ++= Routing.dependencies
-  ).aggregate(repository
-  ).dependsOn(repository)
+  )
+  .aggregate(map_repository)
+  .dependsOn(map_repository)
 
 lazy val helper = (project in file("helper"))
   .settings(
@@ -45,14 +47,22 @@ lazy val repository = (project in file("repository"))
     libraryDependencies ++= Repository.dependencies
   )
 
+lazy val map_repository = (project in file("map-repository"))
+  .settings(
+    name := "map-repository",
+    libraryDependencies ++= MapRepository.dependencies
+  )
+
 ThisBuild / assemblyMergeStrategy := {
-  case PathList("META-INF", xs@_*) =>
+  case PathList("META-INF", xs @ _*) =>
     (xs map {
       _.toLowerCase
     }) match {
-      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) =>
+      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) |
+          ("dependencies" :: Nil) =>
         MergeStrategy.discard
-      case ps@(x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
+      case ps @ (x :: xs)
+          if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
         MergeStrategy.discard
       case "plexus" :: xs =>
         MergeStrategy.discard
