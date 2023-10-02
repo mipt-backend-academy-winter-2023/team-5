@@ -1,16 +1,12 @@
 package routing.graph
 
 import repository.db.{Edges, Nodes}
-import repository.model.{EdgeRow, NodeRow}
 import zio.ZIO
-import zio.prelude.data.Optional.AllValuesAreNullable
-import zio.stream.ZStream
-
 import scala.collection.mutable
 
 
 object CityGraphImpl {
-  def haversineDistance(p1: GeoPoint, p2: GeoPoint): Double = {
+  private def haversineDistance(p1: GeoPoint, p2: GeoPoint): Double = {
     val R = 6371000
     val dLat = (p2.latitude - p1.latitude).toRadians
     val dLon = (p2.longitude - p1.longitude).toRadians
@@ -73,7 +69,7 @@ object CityGraphImpl {
     Nil
   }
 
-  def loadNodes(): CityNodes = {
+  private def loadNodes(): CityNodes = {
     var cityNodes = CityNodes(Map())
     Nodes.getAll().runCollect.map(_.toArray).either.flatMap {
       case Right(arr) => arr match {
