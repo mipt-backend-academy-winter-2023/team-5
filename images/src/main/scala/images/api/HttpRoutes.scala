@@ -1,19 +1,12 @@
 package images.api
 
-import zio.{Task, ZIO}
+import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
-import zio.json._
 import zio.stream.{ZPipeline, ZSink, ZStream}
 
 import java.nio.file.{Files, Paths}
 
-
-case class IdMapPoint(value: Int)
-object IdMapPoint {
-  implicit val encoder: JsonEncoder[IdMapPoint] = DeriveJsonEncoder.gen[IdMapPoint]
-  implicit val decoder: JsonDecoder[IdMapPoint] = DeriveJsonDecoder.gen[IdMapPoint]
-}
 
 object HttpRoutes {
   val app: HttpApp[Any, Response] =
