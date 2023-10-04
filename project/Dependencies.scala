@@ -16,6 +16,10 @@ object Dependencies {
       Seq(zio, pureconfig, postgres).flatten
   }
 
+  object Images extends Dependencies {
+    override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig).flatten
+  }
+
   object Helper extends Dependencies {
     override def dependencies: Seq[ModuleID] = Seq(zio, pureconfig).flatten
   }

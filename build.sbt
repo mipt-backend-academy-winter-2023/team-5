@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import Dependencies.*
+=======
+import Dependencies.{Auth, Routing, Helper, Repository, Images}
+>>>>>>> ce49711 (images added)
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
@@ -11,12 +15,22 @@ lazy val root = (project in file("."))
   .aggregate(
     auth,
     routing,
+<<<<<<< HEAD
     helper
+=======
+    helper,
+    images,
+>>>>>>> ce49711 (images added)
   )
   .dependsOn(
     auth,
     routing,
+<<<<<<< HEAD
     helper
+=======
+    helper,
+    images,
+>>>>>>> ce49711 (images added)
   )
 
 lazy val auth = (project in file("auth"))
@@ -34,6 +48,13 @@ lazy val routing = (project in file("routing"))
   )
   .aggregate(map_repository)
   .dependsOn(map_repository)
+
+lazy val images = (project in file("images"))
+  .settings(
+    name := "project-images",
+    libraryDependencies ++= Routing.dependencies
+  ).aggregate(repository
+  ).dependsOn(repository)
 
 lazy val helper = (project in file("helper"))
   .settings(
