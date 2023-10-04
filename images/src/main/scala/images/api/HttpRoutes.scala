@@ -15,7 +15,7 @@ object HttpRoutes {
         if req.headers.exists(_.key == "X-Node-Id") =>
 
         val idMapPoint = req.headers.find(_.key == "X-Node-Id").get.value
-        val imagePath = Paths.get(s"./resources/${idMapPoint}")
+        val imagePath = Paths.get(s"./resources/$idMapPoint")
 
         (for {
           _ <- ZIO
@@ -27,7 +27,7 @@ object HttpRoutes {
             .via(ZPipeline.deflate())
             .run(ZSink.fromPath(imagePath))
         } yield Response.status(Status.Created))
-          .orElseFail(Response.status(Status.BadRequest))
+          .orElseFail(Response.status(Status.InternalServerError))
       case req@Method.GET -> !! / "get" =>
         val nodeId = req.url.queryParams.get("nodeId")
         if (!nodeId.contains()) {
@@ -38,15 +38,11 @@ object HttpRoutes {
           Response.status(Status.NotFound)
         }
 
-        ZIO.succeed(
-          Response(
-            body = Body.fromStream(
-              ZStream
-                .fromPath(imagePath)
-                .via(ZPipeline.inflate())
-            )
-          )
-        )
+        val bodyStream = ZStream
+          .fromPath(imagePath)
+          .via(ZPipeline.inflate())
+
+        ZIO.succeed(Response(body = Body.fromStream(bodyStream)))
     }
 }
 
