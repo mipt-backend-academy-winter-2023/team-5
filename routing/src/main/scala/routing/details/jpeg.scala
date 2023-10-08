@@ -1,4 +1,4 @@
-package ru.tinkoff.miptBackend2023.photo
+package routing.jpeg
 
 import zio.*
 import zio.stream.*

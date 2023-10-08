@@ -5,6 +5,7 @@ import map_repository.db.Points
 import map_repository.model.Point
 import org.http4s.headers
 import routing.graph.AStar
+import routing.jpeg.JpegValidation
 import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
