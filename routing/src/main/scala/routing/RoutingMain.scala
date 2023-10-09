@@ -1,15 +1,9 @@
 package routing
 
-<<<<<<< HEAD
 import map_repository.Config
 import map_repository.cache.MapInfo
 import map_repository.db.{EdgesImpl, PointsImpl}
 import map_repository.flyway.FlywayAdapter
-=======
-import repository.Config
-import repository.db.{EdgesImpl, Nodes, NodesImpl}
-import repository.flyway.FlywayAdapter
->>>>>>> 81b78d5 (beta version)
 import routing.api.HttpRoutes
 import routing.config.ServiceConfig
 import routing.graph.CityGraphImpl
