@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import Dependencies.*
-=======
-import Dependencies.{Auth, Routing, Helper, Repository, Images}
->>>>>>> ce49711 (images added)
-
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.10"
@@ -15,22 +10,14 @@ lazy val root = (project in file("."))
   .aggregate(
     auth,
     routing,
-<<<<<<< HEAD
-    helper
-=======
     helper,
-    images,
->>>>>>> ce49711 (images added)
+    images
   )
   .dependsOn(
     auth,
-    routing,
-<<<<<<< HEAD
-    helper
-=======
+    routing
     helper,
-    images,
->>>>>>> ce49711 (images added)
+    images
   )
 
 lazy val auth = (project in file("auth"))
