@@ -6,7 +6,6 @@ import map_repository.db.{EdgesImpl, PointsImpl}
 import map_repository.flyway.FlywayAdapter
 import routing.api.HttpRoutes
 import routing.config.ServiceConfig
-import routing.graph.CityGraphImpl
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
