@@ -3,15 +3,11 @@ package routing.api
 import map_repository.cache.MapInfo
 import map_repository.db.Points
 import map_repository.model.Point
-import org.http4s.headers
 import routing.graph.AStar
 import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
-import zio.stream.{ZPipeline, ZSink}
-
-import java.nio.file.Files
 
 case class AuthorizationToken(token: String)
 object AuthorizationToken {
@@ -34,9 +30,6 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val MaxSize: Long = 10L * 1024L * 1024L // 10 MB
-  val DestinationDir: String = "imgs"
-
   val app: HttpApp[Points with MapInfo.Service, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
@@ -47,19 +40,6 @@ object HttpRoutes {
           result <- route(list_data)
         } yield (result)).orElseFail(Response.status(Status.BadRequest))
       }
-      case req @ Method.POST -> !! / "upload" / fileName
-          if req.contentType.contains(
-            headers.`Content-Type`(org.http4s.MediaType.image.jpeg)
-          ) && req.contentLength.getOrElse(0L) <= MaxSize =>
-        (for {
-          path <- ZIO.attempt(
-            Files.createFile(java.nio.file.Paths.get(DestinationDir, fileName))
-          )
-          _ <- req.body.asStream
-            .via(ZPipeline.deflate())
-            .run(ZSink.fromPath(path))
-        } yield (Response.status(Status.Ok)))
-          .orElseFail(Response.status(Status.BadRequest))
     }
 
   private def getPointById(id: Int, points: Array[Point]): Point = {

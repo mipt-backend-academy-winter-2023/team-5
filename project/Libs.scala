@@ -11,6 +11,10 @@ object V {
   val pureconfig = "0.17.3"
 
   val postgres = "42.5.4"
+
+  val http4s_dsl = "0.23.18"
+  val http4s_blaze_server = "0.23.14"
+  val http4s_blaze_client = "0.23.14"
 }
 
 object Libs {
@@ -19,9 +23,9 @@ object Libs {
     "dev.zio" %% "zio" % V.zio,
     "dev.zio" %% "zio-http" % V.zioHttp,
     "dev.zio" %% "zio-sql-postgres" % V.zioSqlPostgres,
-    "org.http4s" %% "http4s-dsl" % "0.23.18",
-    "org.http4s" %% "http4s-blaze-server" % "0.23.14",
-    "org.http4s" %% "http4s-blaze-client" % "0.23.14"
+    "org.http4s" %% "http4s-dsl" % V.http4s-dsl,
+    "org.http4s" %% "http4s-blaze-server" % V.http4s-blaze_server,
+    "org.http4s" %% "http4s-blaze-client" % V.http4s-blaze_client
   )
 
   val pureconfig: List[ModuleID] = List(
