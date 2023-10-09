@@ -16,6 +16,7 @@ object RoutingMain extends ZIOAppDefault {
         _ <- ZIO.logInfo("Start Routing")
         flyway <- ZIO.service[FlywayAdapter.Service]
         _ <- flyway.migration
+
         _ <- zio.http.Server.serve(HttpRoutes.app)
       } yield ()
     server.provide(

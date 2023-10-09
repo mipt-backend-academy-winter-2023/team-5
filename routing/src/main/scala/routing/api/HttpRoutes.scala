@@ -15,7 +15,7 @@ object AuthorizationToken {
     DeriveJsonEncoder.gen[AuthorizationToken]
 }
 
-case class IdMapPoint(value: Int)
+case class IdMapPoint(value: String)
 object IdMapPoint {
   implicit val encoder: JsonEncoder[IdMapPoint] =
     DeriveJsonEncoder.gen[IdMapPoint]
