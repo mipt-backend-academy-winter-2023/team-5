@@ -1,4 +1,4 @@
-package routing.jpeg
+package images.jpeg
 
 import zio.*
 import zio.stream.*

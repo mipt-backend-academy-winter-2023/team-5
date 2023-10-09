@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY build.sbt .
 COPY project project
-COPY routing routing
+COPY images images
 COPY repository repository
 
 RUN sbt clean
@@ -14,10 +14,10 @@ FROM openjdk:8-jre-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/routing/target/scala-2.13/*.jar /app/routing-app.jar
-COPY --from=builder /app/routing/src/main/resources/application.conf /app/routing/src/main/resources/application.conf
+COPY --from=builder /app/images/target/scala-2.13/*.jar /app/images-app.jar
+COPY --from=builder /app/images/src/main/resources/application.conf /app/images/src/main/resources/application.conf
 COPY --from=builder /app/repository/src/main/resources/ /app/repository/src/main/resources/
 
-EXPOSE 8081
+EXPOSE 8083
 
-ENTRYPOINT java -cp /app/*.jar routing.RoutingMain
+ENTRYPOINT java -cp /app/*.jar images.ImagesMain
