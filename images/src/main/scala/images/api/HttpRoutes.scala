@@ -4,7 +4,6 @@ import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.stream.{ZPipeline, ZSink, ZStream}
-import images.validation.JpegValidation
 
 import java.nio.file.{Files, Paths}
 
@@ -25,7 +24,6 @@ object HttpRoutes {
             .map(_ => null)
 
           _ <- req.body.asStream
-            .via(JpegValidation.pipeline)
             .via(ZPipeline.deflate())
             .run(ZSink.fromPath(imagePath))
         } yield Response.status(Status.Created))
