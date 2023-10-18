@@ -26,8 +26,10 @@ class EdgesMock extends Edges {
   override def getAll() = ???
 }
 
-class MapInfoMock(points: Array[Point], edges: Array[Edge]) extends MapInfo.Service {
-  override def getPoints: ZIO[Any, Throwable, Array[Point]] = ZIO.succeed(points)
+class MapInfoMock(points: Array[Point], edges: Array[Edge])
+    extends MapInfo.Service {
+  override def getPoints: ZIO[Any, Throwable, Array[Point]] =
+    ZIO.succeed(points)
 
   override def getEdges: ZIO[Any, Throwable, Array[Edge]] = ZIO.succeed(edges)
 }
@@ -37,10 +39,18 @@ object SimpleHttpServerTest extends ZIOSpecDefault {
     test("have edge") {
       val points = ZLayer.succeed(new PointsMock())
       val edges = ZLayer.succeed(new EdgesMock())
-      val map_info = ZLayer.succeed(new MapInfoMock(Array[Point](Point(0, "biba", 0, 0), Point(1, "boba", 1, 1)), Array[Edge](Edge(0, 0, 1, 0))))
+      val map_info = ZLayer.succeed(
+        new MapInfoMock(
+          Array[Point](Point(0, "biba", 0, 0), Point(1, "boba", 1, 1)),
+          Array[Edge](Edge(0, 0, 1, 0))
+        )
+      )
 
       val request =
-        Request.post(Body.fromString("[{\"value\": 0}, {\"value\": 1}]"), URL(!! / "route" / "search"))
+        Request.post(
+          Body.fromString("[{\"value\": 0}, {\"value\": 1}]"),
+          URL(!! / "route" / "search")
+        )
 
       val appUnderTest = HttpRoutes.app
 
@@ -52,10 +62,18 @@ object SimpleHttpServerTest extends ZIOSpecDefault {
     test("haven't edge") {
       val points = ZLayer.succeed(new PointsMock())
       val edges = ZLayer.succeed(new EdgesMock())
-      val map_info = ZLayer.succeed(new MapInfoMock(Array[Point](Point(0, "biba", 0, 0), Point(1, "boba", 1, 1)), Array[Edge]()))
+      val map_info = ZLayer.succeed(
+        new MapInfoMock(
+          Array[Point](Point(0, "biba", 0, 0), Point(1, "boba", 1, 1)),
+          Array[Edge]()
+        )
+      )
 
       val request =
-        Request.post(Body.fromString("[{\"value\": 0}, {\"value\": 1}]"), URL(!! / "route" / "search"))
+        Request.post(
+          Body.fromString("[{\"value\": 0}, {\"value\": 1}]"),
+          URL(!! / "route" / "search")
+        )
 
       val appUnderTest = HttpRoutes.app
 

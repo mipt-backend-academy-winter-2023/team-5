@@ -46,7 +46,8 @@ object HttpRoutes {
   ): ZIO[MapInfo.Service with Points with Edges, Throwable, Response] = {
     for {
       points <- MapInfo.Service.getPoints()
-      edges <- MapInfo.Service.getEdges()
+      edges <- MapInfo.Service
+        .getEdges()
         .map(_.groupBy(_.pointFrom).map { case (k, v) =>
           getPointById(k, points) -> v
             .map(_.pointTo)
@@ -54,11 +55,11 @@ object HttpRoutes {
             .toList
         })
       path = AStar
-          .aStar(
-            getPointById(routing_points.head.value.toInt, points),
-            getPointById(routing_points(1).value.toInt, points),
-            edges
-          )
+        .aStar(
+          getPointById(routing_points.head.value.toInt, points),
+          getPointById(routing_points(1).value.toInt, points),
+          edges
+        )
     } yield {
       if (path != null) {
         Response.json(
