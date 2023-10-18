@@ -2,6 +2,7 @@ package routing.api
 
 import map_repository.cache.MapInfo
 import map_repository.db.Points
+import map_repository.db.Edges
 import map_repository.model.Point
 import routing.graph.AStar
 import zio.ZIO
@@ -9,13 +10,7 @@ import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
 
-case class AuthorizationToken(token: String)
-object AuthorizationToken {
-  implicit val encoder: JsonEncoder[AuthorizationToken] =
-    DeriveJsonEncoder.gen[AuthorizationToken]
-}
-
-case class IdMapPoint(value: String)
+case class IdMapPoint(value: Int)
 object IdMapPoint {
   implicit val encoder: JsonEncoder[IdMapPoint] =
     DeriveJsonEncoder.gen[IdMapPoint]
@@ -30,7 +25,7 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val app: HttpApp[Points with MapInfo.Service, Response] =
+  val app: HttpApp[MapInfo.Service with Points with Edges, Response] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
         (for {
@@ -38,7 +33,7 @@ object HttpRoutes {
             .map(body => body.fromJson[List[IdMapPoint]])
             .right
           result <- route(list_data)
-        } yield (result)).orElseFail(Response.status(Status.BadRequest))
+        } yield result).orElseFail(Response.status(Status.BadRequest))
       }
     }
 
@@ -48,18 +43,19 @@ object HttpRoutes {
 
   private def route(
       routing_points: List[IdMapPoint]
-  ): ZIO[Points with MapInfo.Service, Throwable, Response] = {
-    (for {
+  ): ZIO[MapInfo.Service with Points with Edges, Throwable, Response] = {
+    for {
       points <- MapInfo.Service.getPoints()
-      edges <- MapInfo.Service
-        .getEdges()
+      edges <- MapInfo.Service.getEdges()
         .map(_.groupBy(_.pointFrom).map { case (k, v) =>
           getPointById(k, points) -> v
             .map(_.pointTo)
             .map(getPointById(_, points))
             .toList
         })
-    } yield ({
+    } yield {
+      println(points)
+      println(edges)
       Response.json(
         AStar
           .aStar(
@@ -69,6 +65,6 @@ object HttpRoutes {
           )
           .toJson
       )
-    }))
+    }
   }
 }
