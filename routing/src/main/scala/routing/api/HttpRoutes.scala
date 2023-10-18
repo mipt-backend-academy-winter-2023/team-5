@@ -53,18 +53,20 @@ object HttpRoutes {
             .map(getPointById(_, points))
             .toList
         })
-    } yield {
-      println(points)
-      println(edges)
-      Response.json(
-        AStar
+      path = AStar
           .aStar(
             getPointById(routing_points.head.value.toInt, points),
             getPointById(routing_points(1).value.toInt, points),
             edges
           )
-          .toJson
-      )
+    } yield {
+      if (path != null) {
+        Response.json(
+          path.toJson
+        )
+      } else {
+        Response.status(Status.NoContent)
+      }
     }
   }
 }

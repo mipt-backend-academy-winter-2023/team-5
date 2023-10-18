@@ -56,6 +56,6 @@ object AStar {
       }
     }
 
-    List.empty[Point]
+    null
   }
 }

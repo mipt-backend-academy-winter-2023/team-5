@@ -9,7 +9,6 @@ services:
         POSTGRES_DB: team5
     ports:
       - "5432:5432"
-      -
   map_database:
     image: "postgis/postgis"
     environment:
