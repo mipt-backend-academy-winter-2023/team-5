@@ -58,8 +58,44 @@ paths:
                   $ref: "#/components/schemas/MapPoint"
         '401':
           $ref: "#/components/responses/UserUnauthorized"
+        '400':
+          $ref: "#/components/responses/NoMapPoints"
+        '405':
+          $ref: "#/components/responses/UnsupportedNumberOfPoints"
       security:
         - bearerAuth: []
+  /images/load:
+    put:
+      summary: Загрузка изображения по идентификатору
+      requestBody:
+        content:
+          image/jpeg
+      parameters:
+        - in: header
+          name: X-Node-Id
+          schema:
+            type: int
+      responses:
+        '201':
+          description: Изображение загружено
+        '500':
+          description: Ошибка сервера
+      security:
+        - bearerAuth: []
+  /images/get/{nodeId}:
+    get:
+      summary: Получить изображение по идентификатору
+      responses:
+        '200':
+          description: Изображение получено
+          content:
+            image/jpeg
+        '400':
+          description: Нет параметра nodeId
+        '404':
+          description: Не найдено изображение по nodeId
+      security:
+        - bearerAuth: [ ]
 
 
 components:
@@ -72,6 +108,10 @@ components:
       description: Не хватает логина или пароля
     LoginUnsuccessful:
       description: Неудачная авторизация
+    NoMapPoints:
+      description: Нет точек для маршрута
+    UnsupportedNumberOfPoints:
+      description: Больше 2х точек в маршруте не поддерживается
   schemas:
     AuthorizationToken:
       type: string
