@@ -1,7 +1,6 @@
 package images
 
 import repository.Config
-import repository.db.{EdgesImpl, Nodes, NodesImpl}
 import repository.flyway.FlywayAdapter
 import images.api.HttpRoutes
 import images.config.ServiceConfig
@@ -20,8 +19,6 @@ object ImagesMain extends ZIOAppDefault {
       Server.live,
       ServiceConfig.live,
       Config.dbLive,
-      Config.connectionPoolLive,
-      zio.sql.ConnectionPool.live,
       FlywayAdapter.live
     )
   }

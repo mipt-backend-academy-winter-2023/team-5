@@ -11,11 +11,9 @@ import java.nio.file.{Files, Paths}
 object HttpRoutes {
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
-      case req@Method.PUT -> !! / "load"
-        if req.headers.exists(_.key == "X-Node-Id") =>
+      case req@Method.POST -> !! / "load" / nodeId =>
 
-        val idMapPoint = req.headers.find(_.key == "X-Node-Id").get.value
-        val imagePath = Paths.get(s"./resources/$idMapPoint")
+        val imagePath = Paths.get(s"./images_sources/$nodeId")
 
         (for {
           _ <- ZIO
@@ -28,21 +26,25 @@ object HttpRoutes {
             .run(ZSink.fromPath(imagePath))
         } yield Response.status(Status.Created))
           .orElseFail(Response.status(Status.InternalServerError))
-      case req@Method.GET -> !! / "get" =>
-        val nodeId = req.url.queryParams.get("nodeId")
-        if (!nodeId.contains()) {
-          Response.status(Status.BadRequest)
+      case req@Method.GET -> !! / "get" / nodeId =>
+        val imagePath = Paths.get(s"./images_sources/${nodeId}")
+        (for {
+          response <-
+            if (!Files.exists(imagePath)) {
+              ZIO.fail("No such file")
+            } else {
+              ZIO.succeed(
+                Response(body = Body.fromStream(
+                  ZStream
+                    .fromPath(imagePath)
+                    .via(ZPipeline.inflate())
+                ))
+              )
+            }
+        } yield response).either.map {
+          case Right(response) => response
+          case Left(_) => Response.status(Status.BadRequest)
         }
-        val imagePath = Paths.get(s"./resources/${nodeId.get}")
-        if (!Files.exists(imagePath)) {
-          Response.status(Status.NotFound)
-        }
-
-        val bodyStream = ZStream
-          .fromPath(imagePath)
-          .via(ZPipeline.inflate())
-
-        ZIO.succeed(Response(body = Body.fromStream(bodyStream)))
     }
 }
 

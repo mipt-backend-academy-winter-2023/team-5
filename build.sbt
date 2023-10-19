@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
   )
   .dependsOn(
     auth,
-    routing
+    routing,
     helper,
     images
   )

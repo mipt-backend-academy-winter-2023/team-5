@@ -64,17 +64,12 @@ paths:
           $ref: "#/components/responses/UnsupportedNumberOfPoints"
       security:
         - bearerAuth: []
-  /images/load:
-    put:
+  /images/load/{nodeId}:
+    post:
       summary: Загрузка изображения по идентификатору
       requestBody:
         content:
           image/jpeg
-      parameters:
-        - in: header
-          name: X-Node-Id
-          schema:
-            type: int
       responses:
         '201':
           description: Изображение загружено
