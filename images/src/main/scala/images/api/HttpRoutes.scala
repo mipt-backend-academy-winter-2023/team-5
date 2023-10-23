@@ -9,7 +9,6 @@ import images.jpeg.JpegValidation
 
 import java.nio.file.{Files, Paths}
 
-
 object HttpRoutes {
   val MaxSize: Long = 10L * 1024L * 1024L // 10 MB
   val DestinationDir: String = "imgs"
@@ -31,20 +30,23 @@ object HttpRoutes {
           _ <- req.body.asStream
             .via(ZPipeline.deflate())
             .run(ZSink.fromPath(path))
-        } yield (Response.status(Status.Ok)))
+        } yield Response.status(Status.Ok))
           .orElseFail(Response.status(Status.BadRequest))
-      case req@Method.GET -> !! / "download" / nodeId =>
+      case req @ Method.POST -> !! / "upload" / _ => // If conditions are not met for upload
+        ZIO.succeed(Response.status(Status.BadRequest))
+      case req @ Method.GET -> !! / "download" / nodeId =>
         val imagePath = Paths.get(DestinationDir, nodeId)
 
         if (!Files.exists(imagePath)) {
-          Response.status(Status.NotFound)
+          ZIO.succeed(Response.status(Status.NotFound)) // Return a 404 status if the file doesn't exist
+        } else {
+          val bodyStream = ZStream
+            .fromPath(imagePath)
+            .via(ZPipeline.inflate())
+          ZIO.succeed(Response(body = Body.fromStream(bodyStream)))
         }
 
-        val bodyStream = ZStream
-          .fromPath(imagePath)
-          .via(ZPipeline.inflate())
-
-        ZIO.succeed(Response(body = Body.fromStream(bodyStream)))
+      case _ => 
+        ZIO.succeed(Response.status(Status.BadRequest))
     }
 }
-

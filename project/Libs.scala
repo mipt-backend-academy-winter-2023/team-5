@@ -12,7 +12,7 @@ object V {
 
   val postgres = "42.5.4"
 
-  val http4s_dsl = "0.23.18"
+  val http4s_dsl = "0.23.14"
   val http4s_blaze_server = "0.23.14"
   val http4s_blaze_client = "0.23.14"
 }
