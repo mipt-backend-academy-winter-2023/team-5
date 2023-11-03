@@ -11,9 +11,9 @@ object MapInfo {
   }
 
   object Service {
-    def getPoints(): ZIO[Service with Points, Throwable, Array[Point]] =
+    def getPoints(): ZIO[Service with Edges with Points, Throwable, Array[Point]] =
       ZIO.serviceWithZIO[Service](_.getPoints)
-    def getEdges(): ZIO[Service with Edges, Throwable, Array[Edge]] =
+    def getEdges(): ZIO[Service with Edges with Points, Throwable, Array[Edge]] =
       ZIO.serviceWithZIO[Service](_.getEdges)
   }
 
