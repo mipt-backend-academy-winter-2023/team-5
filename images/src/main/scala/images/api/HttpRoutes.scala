@@ -19,15 +19,12 @@ object HttpRoutes {
           if req.contentType.contains(
             headers.`Content-Type`(org.http4s.MediaType.image.jpeg)
           ) && req.contentLength.getOrElse(0L) <= MaxSize =>
-        val jpegValidationResult = req.body.asStream.through(JpegValidation.pipeline).runDrain
-
         (for {
-          _ <- jpegValidationResult
-
           path <- ZIO.attempt(
             Files.createFile(Paths.get(DestinationDir, nodeId))
           )
           _ <- req.body.asStream
+            .via(JpegValidation.pipeline)
             .via(ZPipeline.deflate())
             .run(ZSink.fromPath(path))
         } yield Response.status(Status.Ok))
