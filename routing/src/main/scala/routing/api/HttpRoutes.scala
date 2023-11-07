@@ -61,7 +61,7 @@ object HttpRoutes {
           edges
         )
     } yield {
-      if (path != null) {
+      if (path != List.empty[Point]) {
         Response.json(
           path.toJson
         )
