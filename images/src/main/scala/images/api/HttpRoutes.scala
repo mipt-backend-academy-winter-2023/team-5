@@ -5,6 +5,7 @@ import zio.http._
 import zio.http.model.{Method, Status}
 import zio.stream.{ZPipeline, ZSink, ZStream}
 import org.http4s.headers
+import images.jpeg.JpegValidation
 
 import java.nio.file.{Files, Paths}
 
@@ -14,10 +15,16 @@ object HttpRoutes {
 
   val app: HttpApp[Any, Response] =
     Http.collectZIO[Request] {
-      case req @ Method.POST -> !! / "upload" / nodeId if req.contentType.contains(headers.`Content-Type`(org.http4s.MediaType.image.jpeg)) && req.contentLength.getOrElse(0L) <= MaxSize =>
+      case req @ Method.POST -> !! / "upload" / nodeId
+          if req.contentType.contains(
+            headers.`Content-Type`(org.http4s.MediaType.image.jpeg)
+          ) && req.contentLength.getOrElse(0L) <= MaxSize =>
         (for {
-          path <- ZIO.attempt(Files.createFile(Paths.get(DestinationDir, nodeId)))
+          path <- ZIO.attempt(
+            Files.createFile(Paths.get(DestinationDir, nodeId))
+          )
           _ <- req.body.asStream
+            .via(JpegValidation.pipeline)
             .via(ZPipeline.deflate())
             .run(ZSink.fromPath(path))
         } yield Response.status(Status.Ok))
