@@ -1,6 +1,5 @@
 package auth
 
-
 import auth.api.HttpRoutes
 import repository.db.Users
 import repository.model.User
@@ -15,7 +14,6 @@ import zio.test._
 import zio.test.Assertion._
 
 import scala.collection.mutable
-
 
 trait SpecBase {
   val user1: User = User("user1", "***")
@@ -52,7 +50,6 @@ trait SpecBase {
     )
 }
 
-
 object TestRegister extends ZIOSpecDefault with SpecBase {
   def spec: Spec[TestEnvironment with Scope, Any] = suite("TestRegister")(
     test("Register") {
@@ -70,9 +67,13 @@ object TestRegister extends ZIOSpecDefault with SpecBase {
         same_user <- register(user1).exit
       } yield {
         assert(same_user)(
-          fails(equalTo(Some(
-            Response.status(Status.BadRequest)
-          )))
+          fails(
+            equalTo(
+              Some(
+                Response.status(Status.BadRequest)
+              )
+            )
+          )
         )
       }).provideLayer(
         getMockUsers()
@@ -80,7 +81,6 @@ object TestRegister extends ZIOSpecDefault with SpecBase {
     }
   )
 }
-
 
 object TestLogin extends ZIOSpecDefault with SpecBase {
   def spec: Spec[TestEnvironment with Scope, Any] = suite("TestLogin")(
@@ -90,7 +90,7 @@ object TestLogin extends ZIOSpecDefault with SpecBase {
         user_login1 <- login(user1)
       } yield {
         assertTrue(
-            checkStatus(user_register, Status.Created)
+          checkStatus(user_register, Status.Created)
             && checkStatus(user_login1, Status.Ok)
         )
       }).provideLayer(
@@ -102,9 +102,13 @@ object TestLogin extends ZIOSpecDefault with SpecBase {
         user_login <- login(user1).exit
       } yield {
         assert(user_login)(
-          fails(equalTo(Some(
-            Response.status(Status.BadRequest)
-          )))
+          fails(
+            equalTo(
+              Some(
+                Response.status(Status.BadRequest)
+              )
+            )
+          )
         )
       }).provideLayer(
         getMockUsers()

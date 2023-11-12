@@ -6,9 +6,7 @@ import zio.ZIO
 import zio.stream.ZStream
 import scala.collection.mutable
 
-
-final class MockUsers(users: mutable.Map[String, User])
-  extends Users {
+final class MockUsers(users: mutable.Map[String, User]) extends Users {
   override def add(user: User): ZIO[Users, Throwable, Unit] = {
     if (!users.contains(user.username)) {
       users += user.username -> user
