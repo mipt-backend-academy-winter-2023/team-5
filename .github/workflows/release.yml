@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  pull_request:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  test-and-style:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Cache SBT
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.ivy/cache
+            ~/.sbt
+            ~/.coursier/cache/v1
+            ~/.cache/coursier/v1
+            ~/.cache/coursier
+            ~/.m2/repository
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.scala') }}
+
+      - name: Run sbt scalafmt
+        run: sbt scalafmtCheckAll
+
+      - name: Run sbt test
+        run: sbt test
