@@ -10,6 +10,6 @@ object StartApp extends ZIOAppDefault {
       routing <- RoutingMain.run.fork
       routing <- RoutingMain.run.fork
       images <- ImagesMain.run.fork
-      _ <- auth.join *> routing.join *> images *> ZIO.never
+      _ <- auth.join *> routing.join *> images.join *> ZIO.never
     } yield ()
 }
