@@ -35,7 +35,9 @@ object HttpRoutes {
         val imagePath = Paths.get(DestinationDir, nodeId)
 
         if (!Files.exists(imagePath)) {
-          ZIO.succeed(Response.status(Status.NotFound)) // Return a 404 status if the file doesn't exist
+          ZIO.succeed(
+            Response.status(Status.NotFound)
+          ) // Return a 404 status if the file doesn't exist
         } else {
           val bodyStream = ZStream
             .fromPath(imagePath)
@@ -43,7 +45,7 @@ object HttpRoutes {
           ZIO.succeed(Response(body = Body.fromStream(bodyStream)))
         }
 
-      case _ => 
+      case _ =>
         ZIO.succeed(Response.status(Status.BadRequest))
     }
 }
