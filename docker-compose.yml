@@ -35,3 +35,9 @@ services:
       - database
     ports:
       - "8081:8081"
+images_service:
+    build:
+      context: .
+      dockerfile: Dockerfile-images
+    ports:
+      - "8083:8083"

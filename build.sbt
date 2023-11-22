@@ -11,12 +11,14 @@ lazy val root = (project in file("."))
   .aggregate(
     auth,
     routing,
-    helper
+    helper,
+    images
   )
   .dependsOn(
     auth,
     routing,
-    helper
+    helper,
+    images
   )
 
 lazy val auth = (project in file("auth"))
@@ -51,6 +53,12 @@ lazy val map_repository = (project in file("map-repository"))
   .settings(
     name := "map-repository",
     libraryDependencies ++= MapRepository.dependencies
+  )
+
+lazy val images = (project in file("images"))
+  .settings(
+    name := "images",
+    libraryDependencies ++= Images.dependencies
   )
 
 ThisBuild / assemblyMergeStrategy := {
