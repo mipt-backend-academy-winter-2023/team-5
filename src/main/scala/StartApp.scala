@@ -1,5 +1,6 @@
 import auth.AuthMain
 import routing.RoutingMain
+import images.ImagesMain
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object StartApp extends ZIOAppDefault {
@@ -7,6 +8,8 @@ object StartApp extends ZIOAppDefault {
     for {
       auth <- AuthMain.run.fork
       routing <- RoutingMain.run.fork
-      _ <- auth.join *> routing.join *> ZIO.never
+      routing <- RoutingMain.run.fork
+      images <- ImagesMain.run.fork
+      _ <- auth.join *> routing.join *> images.join *> ZIO.never
     } yield ()
 }

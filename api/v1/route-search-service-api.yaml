@@ -60,6 +60,34 @@ paths:
           $ref: "#/components/responses/UserUnauthorized"
       security:
         - bearerAuth: []
+  /images/upload/{nodeId}:
+    post:
+      summary: Загрузка изображения
+      responses:
+        '200':
+          description: Успешно
+          content:
+            image/jpeg
+        '400':
+          description: Неправильные параметры
+        '404':
+          description: Неправильный nodeId
+      security:
+        - bearerAuth: []
+  /images/download/{nodeId}:
+    get:
+      summary: Получить изображение по nodeId
+      responses:
+        '200':
+          description: Успешно
+          content:
+            image/jpeg
+        '400':
+          description: Неправильные параметры
+        '404':
+          description: Неправильный nodeId
+      security:
+        - bearerAuth: []
 
 
 components:
