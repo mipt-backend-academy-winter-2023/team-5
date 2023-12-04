@@ -27,14 +27,30 @@ services:
     ports:
       - "8082:8082"
 
-  routing_service:
+  routing_service_1:
     build:
       context: .
       dockerfile: Dockerfile-routing
     depends_on:
       - database
-    ports:
-      - "8081:8081"
+  routing_service_2:
+    build:
+      context: .
+      dockerfile: Dockerfile-routing
+    depends_on:
+      - database
+  routing_service_3:
+    build:
+      context: .
+      dockerfile: Dockerfile-routing
+    depends_on:
+      - database
+  routing-balancer:
+      image: nginx
+      ports:
+        - "7070:7070"
+      volumes:
+        - "./nginx.conf:/etc/nginx/nginx.conf"
   images_service:
       build:
         context: .
