@@ -15,6 +15,9 @@ object V {
   val http4s_dsl = "0.23.14"
   val http4s_blaze_server = "0.23.14"
   val http4s_blaze_client = "0.23.14"
+
+  val sttp = "3.9.0"
+  val rezilience = "0.9.3"
 }
 
 object Libs {
@@ -50,5 +53,14 @@ object Libs {
 
   val postgres: List[ModuleID] = List(
     "org.postgresql" % "postgresql" % V.postgres
+  )
+
+  val sttp: List[ModuleID] = List(
+    "com.softwaremill.sttp.client3" %% "zio" % V.sttp,
+    "com.softwaremill.sttp.client3" %% "circe" % V.sttp
+  )
+
+  val rezilience = List(
+    "nl.vroste" %% "rezilience" % V.rezilience
   )
 }

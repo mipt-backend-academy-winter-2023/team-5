@@ -27,6 +27,13 @@ services:
     ports:
       - "8082:8082"
 
+  jams:
+    image: "vovapolu/jams:0.1.0"
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+      -
   routing_service_1:
     build:
       context: .
