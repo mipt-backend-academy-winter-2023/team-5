@@ -1,6 +1,11 @@
 package routing
 
-import circuitbreaker.{JamValue, JamsIntegration, JamsIntegrationImpl, ZioCircuitBreakerImpl}
+import circuitbreaker.{
+  JamValue,
+  JamsIntegration,
+  JamsIntegrationImpl,
+  ZioCircuitBreakerImpl
+}
 import map_repository.cache.MapInfo
 import map_repository.db.{Edges, Points}
 import map_repository.model.{Edge, Point}
@@ -29,7 +34,7 @@ class EdgesMock extends Edges {
 }
 
 class MapInfoMock(points: Array[Point], edges: Array[Edge])
-  extends MapInfo.Service {
+    extends MapInfo.Service {
   override def getPoints: ZIO[Any, Throwable, Array[Point]] =
     ZIO.succeed(points)
 
@@ -66,7 +71,15 @@ object SimpleHttpServerTest extends ZIOSpecDefault {
       (for {
         response <- appUnderTest.runZIO(request)
       } yield assert(response.status)(equalTo(Status.Ok)))
-        .provide(points, edges, map_info, jam, ZioCircuitBreakerImpl.live, Scope.default, HttpClientZioBackend.layer())
+        .provide(
+          points,
+          edges,
+          map_info,
+          jam,
+          ZioCircuitBreakerImpl.live,
+          Scope.default,
+          HttpClientZioBackend.layer()
+        )
     },
     test("haven't edge") {
       val points = ZLayer.succeed(new PointsMock())
@@ -92,7 +105,15 @@ object SimpleHttpServerTest extends ZIOSpecDefault {
       (for {
         response <- appUnderTest.runZIO(request)
       } yield assert(response.status)(not(equalTo(Status.Ok))))
-        .provide(points, edges, map_info, jam, ZioCircuitBreakerImpl.live, Scope.default, HttpClientZioBackend.layer())
+        .provide(
+          points,
+          edges,
+          map_info,
+          jam,
+          ZioCircuitBreakerImpl.live,
+          Scope.default,
+          HttpClientZioBackend.layer()
+        )
     }
   )
 }
