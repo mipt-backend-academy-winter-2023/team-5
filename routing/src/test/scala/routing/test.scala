@@ -29,7 +29,7 @@ class EdgesMock extends Edges {
 }
 
 class MapInfoMock(points: Array[Point], edges: Array[Edge])
-    extends MapInfo.Service {
+  extends MapInfo.Service {
   override def getPoints: ZIO[Any, Throwable, Array[Point]] =
     ZIO.succeed(points)
 
