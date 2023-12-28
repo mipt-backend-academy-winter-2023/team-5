@@ -9,6 +9,10 @@ import routing.config.ServiceConfig
 import zio.http.Server
 import zio.{Scope, ZIO, ZIOAppArgs, ZIOAppDefault}
 
+import sttp.client3.httpclient.zio.HttpClientZioBackend
+import circuitbreaker.JamsIntegrationImpl
+import circuitbreaker.ZioCircuitBreakerImpl
+
 object RoutingMain extends ZIOAppDefault {
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
     val server =
@@ -28,7 +32,11 @@ object RoutingMain extends ZIOAppDefault {
       FlywayAdapter.live,
       PointsImpl.live,
       EdgesImpl.live,
-      MapInfo.live
+      MapInfo.live,
+      JamsIntegrationImpl.live,
+      ZioCircuitBreakerImpl.live,
+      Scope.default,
+      HttpClientZioBackend.layer()
     )
   }
 }

@@ -9,6 +9,11 @@ import zio.ZIO
 import zio.http._
 import zio.http.model.{Method, Status}
 import zio.json._
+import nl.vroste.rezilience.CircuitBreaker.{CircuitBreakerOpen, WrappedError}
+import circuitbreaker.{JamValue, JamsIntegration}
+import circuitbreaker.ZioCircuitBreaker
+
+import scala.collection.concurrent.TrieMap
 
 case class IdMapPoint(value: Int)
 object IdMapPoint {
@@ -25,7 +30,12 @@ object MapPoint {
 }
 
 object HttpRoutes {
-  val app: HttpApp[MapInfo.Service with Points with Edges, Response] =
+  val fallbackJam: TrieMap[Int, JamValue] = TrieMap.empty
+
+  val app: HttpApp[
+    MapInfo.Service with Points with Edges with JamsIntegration with ZioCircuitBreaker,
+    Response
+  ] =
     Http.collectZIO[Request] {
       case req @ Method.POST -> !! / "route" / "search" => {
         (for {
@@ -43,8 +53,12 @@ object HttpRoutes {
 
   private def route(
       routing_points: List[IdMapPoint]
-  ): ZIO[MapInfo.Service with Points with Edges, Throwable, Response] = {
-    for {
+  ): ZIO[
+    MapInfo.Service with Points with Edges with JamsIntegration with ZioCircuitBreaker,
+    Throwable,
+    Response
+  ] = {
+    (for {
       points <- MapInfo.Service.getPoints()
       edges <- MapInfo.Service
         .getEdges()
@@ -54,20 +68,39 @@ object HttpRoutes {
             .map(getPointById(_, points))
             .toList
         })
-      path = AStar
-        .aStar(
-          getPointById(routing_points.head.value.toInt, points),
-          getPointById(routing_points(1).value.toInt, points),
-          edges
-        )
-    } yield {
-      if (path != List.empty[Point]) {
-        Response.json(
-          path.toJson
-        )
-      } else {
+      from <- ZIO.succeed(routing_points.head.value)
+      to <- ZIO.succeed(routing_points(1).value)
+      path <- ZIO.succeed(
+        AStar
+          .aStar(
+            getPointById(from, points),
+            getPointById(to, points),
+            edges
+          )
+      )
+      jam <-
+        ZioCircuitBreaker
+          .run(JamsIntegration.getJam(from))
+          .tap(jam => ZIO.succeed(fallbackJam.put(from, jam)))
+          .catchAll(error =>
+            fallbackJam.get(from) match {
+              case Some(data) =>
+                ZIO.logInfo(s"Get data from fallback $data") *> ZIO.succeed(
+                  data
+                )
+              case None =>
+                ZIO.logError(s"Get error from jams ${error.toString}") *>
+                  ZIO.fail(error)
+            }
+          )
+    } yield (path, jam)).either.map {
+      case Right((path, jam)) if path == List.empty =>
         Response.status(Status.NoContent)
-      }
+      case Right((path, jam)) =>
+        Response.json(
+          Map[String, String]("path" -> path.toJson, "jam" -> jam.toJson).toJson
+        )
+      case Left((path, jam)) => Response.status(Status.NoContent)
     }
   }
 }

@@ -13,7 +13,7 @@ object Dependencies {
 
   object Routing extends Dependencies {
     override def dependencies: Seq[ModuleID] =
-      Seq(zio, pureconfig, postgres).flatten
+      Seq(zio, pureconfig, postgres, sttp, rezilience).flatten
   }
 
   object Images extends Dependencies {
